@@ -14,8 +14,9 @@ const execAsync = promisify(exec);
 const removeDirAndFiles = promisify(rimraf);
 
 export default async (composer: any): Promise<void> => {
-  const dotnetTemplatePath = path.resolve(__dirname, '../../../runtime/dotnet');
-  const nodeTemplatePath = path.resolve(__dirname, '../../../runtime/node');
+  const runtimeTemplateFolder = process.env.COMPOSER_RUNTIME_FOLDER || path.resolve(__dirname, '../../../runtime');
+  const dotnetTemplatePath = path.resolve(runtimeTemplateFolder, './dotnet');
+  const nodeTemplatePath = path.resolve(runtimeTemplateFolder, './node');
   // register the bundled c# runtime used by the local publisher with the eject feature
   composer.addRuntimeTemplate({
     key: 'csharp-azurewebapp',
