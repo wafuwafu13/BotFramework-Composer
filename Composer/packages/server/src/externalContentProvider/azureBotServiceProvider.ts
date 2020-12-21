@@ -1,8 +1,13 @@
-import { IContentProviderMetadata, ExternalContentProvider } from './externalContentProvider';
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 // import { authService } from '../services/auth/auth';
 // import logger from '../logger';
 import { join } from 'path';
+
 import { remove, ensureDirSync } from 'fs-extra';
+
+import { IContentProviderMetadata, ExternalContentProvider } from './externalContentProvider';
 // import { urlencoded } from 'body-parser';
 
 function prettyPrintError(err: string | Error): string {
@@ -33,7 +38,7 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
   }
 
   public async downloadBotContent() {
-    const { resourceId } = this.metadata;
+    const { botName, resourceId } = this.metadata;
     /**
      * TODO: get download url from payload, then download zip
      * then write the zip to disk
@@ -42,15 +47,8 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
       // get resource by resourceId
     }
     ensureDirSync(this.tempBotAssetsDir);
-    const zipPath = join(this.tempBotAssetsDir, 'EchoBot-1.zip');
+    const zipPath = join(this.tempBotAssetsDir, `${botName}.zip`);
 
-    // const writeStream = createWriteStream(zipPath);
-    // await new Promise((resolve, reject) => {
-    //   writeStream.once('finish', resolve);
-    //   writeStream.once('error', reject);
-    //   result.body.pipe(writeStream);
-    // });
-    // fetch zip
     return {
       zipPath: zipPath,
       eTag: '',

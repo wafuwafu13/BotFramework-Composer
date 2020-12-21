@@ -64,7 +64,8 @@ function getUserFriendlySource(source?: ExternalContentProviderType): string {
   switch (source) {
     case 'pva':
       return 'PowerVirtualAgents';
-
+    case 'abs':
+      return 'AzureBotService';
     default:
       return 'external service';
   }
