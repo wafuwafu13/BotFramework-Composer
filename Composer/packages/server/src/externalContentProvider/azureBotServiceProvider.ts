@@ -1,14 +1,13 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-// import { authService } from '../services/auth/auth';
-// import logger from '../logger';
 import { join } from 'path';
+import { createWriteStream } from 'fs';
 
+import fetch, { RequestInit } from 'node-fetch';
 import { remove, ensureDirSync } from 'fs-extra';
 
 import { IContentProviderMetadata, ExternalContentProvider } from './externalContentProvider';
-// import { urlencoded } from 'body-parser';
 
 function prettyPrintError(err: string | Error): string {
   if (typeof err === 'string') {
@@ -38,16 +37,25 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
   }
 
   public async downloadBotContent() {
-    const { botName, resourceId } = this.metadata;
-    /**
-     * TODO: get download url from payload, then download zip
-     * then write the zip to disk
-     */
-    if (resourceId) {
-      // get resource by resourceId
+    const url = this.getBotContentUrl(this.metadata);
+    const options: RequestInit = {
+      method: 'GET',
+      headers: await this.getRequestHeaders(),
+    };
+
+    const result = await fetch(url, options);
+    if (!result || !result.body) {
+      throw new Error('Response containing zip does not have a body');
     }
+
     ensureDirSync(this.tempBotAssetsDir);
-    const zipPath = join(this.tempBotAssetsDir, `${botName}.zip`);
+    const zipPath = join(this.tempBotAssetsDir, `bot-assets-${this.metadata.botName}-${Date.now()}.zip`);
+    const writeStream = createWriteStream(zipPath);
+    await new Promise((resolve, reject) => {
+      writeStream.once('finish', resolve);
+      writeStream.once('error', reject);
+      result.body.pipe(writeStream);
+    });
 
     return {
       zipPath: zipPath,
@@ -55,6 +63,7 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
       urlSuffix: this.getDeepLink(),
     };
   }
+
   public async cleanUp() {
     await remove(this.tempBotAssetsDir);
   }
@@ -64,8 +73,10 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
   public async authenticate() {
     return await this.getAccessToken();
   }
+
   private async getAccessToken(): Promise<string> {
     try {
+      // TODO: impl Azure auth
       // const accessToken = await authService.getAccessToken({
       //   targetResource: 'https://management.core.windows.net/',
       // });
@@ -73,12 +84,30 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
       //   throw 'User cancelled login flow.';
       // }
       // return accessToken;
-      return 'test token';
+      return '<TestToken>';
     } catch (error) {
-      console.log(error);
       throw `Error while trying to get access token: ${prettyPrintError(error)}`;
     }
   }
+
+  private getBotContentUrl(metadata: AzureBotServiceMetadata) {
+    const { botName } = metadata;
+    const botServiceHost = `https://${botName}.scm.azurewebsites.net`;
+    // TODO: make sure the publish profile lives in there.
+    const downloadZipUrl = `${botServiceHost}/api/zip/site/wwwroot/ComposerDialogs`;
+    return downloadZipUrl;
+  }
+
+  private async getRequestHeaders() {
+    const { tenantId } = this.metadata;
+    const token = await this.getAccessToken();
+    return {
+      Authorization: `Bearer ${token}`,
+      'X-CCI-TenantId': tenantId,
+      'X-CCI-Routing-TenantId': tenantId,
+    };
+  }
+
   private getDeepLink(): string {
     // use metadata (if provided) to create a deep link to a specific dialog / trigger / action etc. after opening bot.
     let deepLink = '';
