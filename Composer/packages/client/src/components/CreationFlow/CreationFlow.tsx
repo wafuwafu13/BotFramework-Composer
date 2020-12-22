@@ -143,7 +143,9 @@ const CreationFlow: React.FC<CreationFlowProps> = () => {
 
   const handleCreateNext = async (data: string) => {
     setCreationFlowStatus(CreationFlowStatus.NEW_FROM_TEMPLATE);
-    navigate(`./create/${data}`);
+    // HACK: has to use absolute path here because of
+    //       'bfcomposer://create' triggers the creation flow modal under arbitrary paths besides '/projects/*'
+    navigate(`/projects/create/${data}`);
   };
 
   return (
