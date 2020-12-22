@@ -6,6 +6,7 @@ import { createWriteStream } from 'fs';
 
 import fetch, { RequestInit } from 'node-fetch';
 import { remove, ensureDirSync } from 'fs-extra';
+import AdmZip from 'adm-zip';
 
 import { IContentProviderMetadata, ExternalContentProvider } from './externalContentProvider';
 
@@ -20,17 +21,27 @@ function prettyPrintError(err: string | Error): string {
 }
 
 export type AzureBotServiceMetadata = IContentProviderMetadata & {
+  /** ABS channel ID */
   botId?: string;
+  /** ABS channel name */
   botName?: string;
+  /** Azure App Id */
   appId: string;
+  /** Azure Subscription Id */
   subscriptionId: string;
+  /** Azure resource group Id */
   resourceGroup?: string;
+  /** ? */
   keyvaultSecret?: string;
+  /** ABS Channel uniq ID */
   resourceId: string;
+  /** Service URI */
+  serviceHost?: string;
 };
 
 export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotServiceMetadata> {
   private tempBotAssetsDir = join(process.env.COMPOSER_TEMP_DIR as string, 'abs-assets');
+  private projectId = '';
 
   constructor(metadata: AzureBotServiceMetadata) {
     super(metadata);
@@ -56,6 +67,7 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
       writeStream.once('error', reject);
       result.body.pipe(writeStream);
     });
+    await this.loadProjectContent(zipPath);
 
     return {
       zipPath: zipPath,
@@ -67,8 +79,21 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
   public async cleanUp() {
     await remove(this.tempBotAssetsDir);
   }
+
+  private async loadProjectContent(zipPath: string) {
+    // read projectId from zip file
+    const zip = new AdmZip(zipPath);
+    const botprojEntries = zip.getEntries().filter((entry) => entry.entryName.endsWith('.botproj'));
+    if (botprojEntries.length) {
+      this.projectId = botprojEntries[0].entryName;
+    } else {
+      this.projectId = '';
+    }
+  }
+
   public async getAlias() {
-    return '';
+    // To load correct project, alias should be project name as the project's URI.
+    return `abs-${this.projectId}`;
   }
   public async authenticate() {
     return await this.getAccessToken();

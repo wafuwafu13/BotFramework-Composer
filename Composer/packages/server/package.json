@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "@botframework-composer/test-utils": "*",
+    "@types/adm-zip": "^0.4.33",
     "@types/archiver": "^3.1.0",
     "@types/body-parser": "^1.17.0",
     "@types/compression": "^1.0.1",
@@ -68,6 +69,7 @@
     "@microsoft/bf-generate-library": "^4.10.0-daily.20201210.194231",
     "@microsoft/bf-lu": "^4.12.0-dev.20201209.a2ab9dd",
     "@microsoft/bf-orchestrator": "4.11.0-beta.20201208.165a6d6",
+    "adm-zip": "^0.5.1",
     "applicationinsights": "^1.8.7",
     "archiver": "^5.0.2",
     "axios": "^0.21.0",
