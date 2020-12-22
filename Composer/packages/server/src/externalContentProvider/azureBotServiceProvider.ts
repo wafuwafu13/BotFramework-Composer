@@ -67,7 +67,7 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
       writeStream.once('error', reject);
       result.body.pipe(writeStream);
     });
-    await this.loadProjectContent(zipPath);
+    await this.syncWithProjectContent(zipPath);
 
     return {
       zipPath: zipPath,
@@ -80,15 +80,34 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
     await remove(this.tempBotAssetsDir);
   }
 
-  private async loadProjectContent(zipPath: string) {
-    // read projectId from zip file
+  private async syncWithProjectContent(zipPath: string) {
     const zip = new AdmZip(zipPath);
+
+    // Read projectId from zip file
     const botprojEntries = zip.getEntries().filter((entry) => entry.entryName.endsWith('.botproj'));
     if (botprojEntries.length) {
       this.projectId = botprojEntries[0].entryName;
     } else {
       this.projectId = '';
     }
+
+    // Write publish profile to settings.publishTargets.
+    // Alternation: in client's creation modal, create publish profile by using payload in url params
+    const appsettingsEntry = zip.getEntry('settings/appsettings.json');
+    const appsettings: any = JSON.parse(appsettingsEntry.getData().toString());
+    const newProfile = {
+      name: `${this.metadata.resourceId}-${this.metadata.botName}`,
+      type: 'azurePublish',
+      configuration: JSON.stringify({ abs: this.metadata }),
+    };
+    if (Array.isArray(appsettings.publishTargets)) {
+      appsettings.publishTargets.push(newProfile);
+    } else {
+      appsettings.publishTargets = [newProfile];
+    }
+    appsettingsEntry.setData(JSON.stringify(appsettings, null, '\t'));
+
+    zip.writeZip(zipPath);
   }
 
   public async getAlias() {
