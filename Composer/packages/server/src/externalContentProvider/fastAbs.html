@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ABS -> Composer</title>
+</head>
+<script>
+    payload = {
+        botId: 'absBot1',
+        botName: 'luhan0603-dev',
+        appId: 'testAppId',
+        subscriptionId: 'testSubId',
+        resourceGroup: 'testResGroup',
+        keyvaultSecret: 'testKvSec',
+        resourceId: 'testResourceId',
+        endpoint: '',
+        // webapp...
+        tag: {
+            webapp: '...'
+        }
+    }
+    //
+    importAbsUrl = `bfcomposer://import?source=abs&payload=${encodeURI(JSON.stringify(payload))}`
+
+    createAbsUrl = `bfcomposer://create?source=abs&payload=${encodeURI(JSON.stringify(payload))}`
+</script>
+
+<body>
+    <input type="button" value="//import" onclick="window.open(importAbsUrl)" />
+    <input type="button" value="//create" onclick="window.open(createAbsUrl)" />
+</body>
+
+</html>
