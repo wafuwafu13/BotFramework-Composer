@@ -23,25 +23,23 @@ function prettyPrintError(err: string | Error): string {
 export type AzureBotServiceMetadata = IContentProviderMetadata & {
   /** ABS channel ID */
   botId?: string;
-  /** ABS channel name */
-  botName?: string;
+  /** service name */
+  serviceName?: string;
   /** Azure App Id */
   appId: string;
   /** Azure Subscription Id */
   subscriptionId: string;
   /** Azure resource group Id */
   resourceGroup?: string;
-  /** ? */
-  keyvaultSecret?: string;
   /** ABS Channel uniq ID */
   resourceId: string;
   /** Service URI */
-  serviceHost?: string;
+  serviceURI?: string;
 };
 
 export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotServiceMetadata> {
   private tempBotAssetsDir = join(process.env.COMPOSER_TEMP_DIR as string, 'abs-assets');
-  private projectId = '';
+  private botName = '';
 
   constructor(metadata: AzureBotServiceMetadata) {
     super(metadata);
@@ -54,26 +52,30 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
       headers: await this.getRequestHeaders(),
     };
 
-    const result = await fetch(url, options);
-    if (!result || !result.body) {
-      throw new Error('Response containing zip does not have a body');
+    try {
+      const result = await fetch(url, options);
+      if (!result || !result.body) {
+        throw new Error('Response containing zip does not have a body');
+      }
+
+      ensureDirSync(this.tempBotAssetsDir);
+      const zipPath = join(this.tempBotAssetsDir, `bot-assets-${this.metadata.serviceName}-${Date.now()}.zip`);
+      const writeStream = createWriteStream(zipPath);
+      await new Promise((resolve, reject) => {
+        writeStream.once('finish', resolve);
+        writeStream.once('error', reject);
+        result.body.pipe(writeStream);
+      });
+      await this.syncWithProjectContent(zipPath);
+
+      return {
+        zipPath: zipPath,
+        eTag: '',
+        urlSuffix: this.getDeepLink(),
+      };
+    } catch (error) {
+      throw { message: error.message, status: 404 };
     }
-
-    ensureDirSync(this.tempBotAssetsDir);
-    const zipPath = join(this.tempBotAssetsDir, `bot-assets-${this.metadata.botName}-${Date.now()}.zip`);
-    const writeStream = createWriteStream(zipPath);
-    await new Promise((resolve, reject) => {
-      writeStream.once('finish', resolve);
-      writeStream.once('error', reject);
-      result.body.pipe(writeStream);
-    });
-    await this.syncWithProjectContent(zipPath);
-
-    return {
-      zipPath: zipPath,
-      eTag: '',
-      urlSuffix: this.getDeepLink(),
-    };
   }
 
   public async cleanUp() {
@@ -83,12 +85,12 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
   private async syncWithProjectContent(zipPath: string) {
     const zip = new AdmZip(zipPath);
 
-    // Read projectId from zip file
+    // Read botName from zip file
     const botprojEntries = zip.getEntries().filter((entry) => entry.entryName.endsWith('.botproj'));
     if (botprojEntries.length) {
-      this.projectId = botprojEntries[0].entryName;
+      this.botName = botprojEntries[0].entryName;
     } else {
-      this.projectId = '';
+      this.botName = '';
     }
 
     // Write publish profile to settings.publishTargets.
@@ -96,7 +98,7 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
     const appsettingsEntry = zip.getEntry('settings/appsettings.json');
     const appsettings: any = JSON.parse(appsettingsEntry.getData().toString());
     const newProfile = {
-      name: `${this.metadata.resourceId}-${this.metadata.botName}`,
+      name: `${this.metadata.resourceId}-${this.metadata.serviceName}`,
       type: 'azurePublish',
       configuration: JSON.stringify({ abs: this.metadata }),
     };
@@ -112,7 +114,7 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
 
   public async getAlias() {
     // To load correct project, alias should be project name as the project's URI.
-    return `abs-${this.projectId}`;
+    return `abs-${this.botName}`;
   }
   public async authenticate() {
     return await this.getAccessToken();
@@ -128,15 +130,15 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
       //   throw 'User cancelled login flow.';
       // }
       // return accessToken;
-      return '<TestToken>';
+      return '';
     } catch (error) {
       throw `Error while trying to get access token: ${prettyPrintError(error)}`;
     }
   }
 
   private getBotContentUrl(metadata: AzureBotServiceMetadata) {
-    const { botName } = metadata;
-    const botServiceHost = `https://${botName}.scm.azurewebsites.net`;
+    const { serviceName } = metadata;
+    const botServiceHost = `https://${serviceName}.scm.azurewebsites.net`;
     // TODO: make sure the publish profile lives in there.
     const downloadZipUrl = `${botServiceHost}/api/zip/site/wwwroot/ComposerDialogs`;
     return downloadZipUrl;

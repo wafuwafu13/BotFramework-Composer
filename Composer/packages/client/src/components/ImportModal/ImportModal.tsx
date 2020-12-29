@@ -126,58 +126,65 @@ export const ImportModal: React.FC<RouteComponentProps> = (props) => {
     }
   }, [existingProject, importedProjectInfo]);
 
-  useEffect(() => {
-    if (modalState === 'downloadingContent') {
-      const importBotContent = async () => {
-        if (location && location.href) {
-          try {
-            const { description, name } = importPayload;
+  const importBotContent = useCallback(async () => {
+    if (location && location.href) {
+      try {
+        const { description, name } = importPayload;
 
-            const res = await axios.post<{ alias: string; eTag: string; templateDir: string; urlSuffix: string }>(
-              `/api/import/${importSource}?payload=${encodeURIComponent(JSON.stringify(importPayload))}`
-            );
-            const { alias, eTag, templateDir, urlSuffix } = res.data;
-            const projectInfo = {
-              description,
-              name,
-              templateDir,
-              urlSuffix,
-              eTag,
-              source: importSource as ExternalContentProviderType,
-              alias,
-            };
-            setImportedProjectInfo(projectInfo);
+        const res = await axios.post<{ alias: string; eTag: string; templateDir: string; urlSuffix: string }>(
+          `/api/import/${importSource}?payload=${encodeURIComponent(JSON.stringify(importPayload))}`
+        );
+        const { alias, eTag, templateDir, urlSuffix } = res.data;
+        const projectInfo = {
+          description,
+          name,
+          templateDir,
+          urlSuffix,
+          eTag,
+          source: importSource as ExternalContentProviderType,
+          alias,
+        };
+        setImportedProjectInfo(projectInfo);
 
-            if (alias) {
-              // check to see if Composer currently has a bot project corresponding to the alias
-              const aliasRes = await axios.get<any>(`/api/projects/alias/${alias}`, {
-                validateStatus: (status) => {
-                  // a 404 should fall through
-                  if (status === 404) {
-                    return true;
-                  }
-                  return status >= 200 && status < 300;
-                },
-              });
-              if (aliasRes.status === 200) {
-                const project = aliasRes.data;
-                setExistingProject(project);
-                // ask user if they want to save to existing, or save as a new project
-                setModalState('promptingToSave');
-                return;
+        if (alias) {
+          // check to see if Composer currently has a bot project corresponding to the alias
+          const aliasRes = await axios.get<any>(`/api/projects/alias/${alias}`, {
+            validateStatus: (status) => {
+              // a 404 should fall through
+              if (status === 404) {
+                return true;
               }
-            }
-            importAsNewProject(projectInfo);
-          } catch (e) {
-            // something went wrong, abort and navigate to the home page
-            console.error(`Something went wrong during import: ${e}`);
-            navigate('/home');
+              return status >= 200 && status < 300;
+            },
+          });
+          if (aliasRes.status === 200) {
+            const project = aliasRes.data;
+            setExistingProject(project);
+            // ask user if they want to save to existing, or save as a new project
+            setModalState('promptingToSave');
+            return;
           }
         }
-      };
+        importAsNewProject(projectInfo);
+      } catch (e) {
+        // if error is no botContent found, then navigate to create new
+        const payload = e.response?.data?.payload;
+        if (importSource === 'abs' && e.response?.status === 404) {
+          navigate(`/projects/create?source=abs&payload=${encodeURI(JSON.stringify(payload))}`);
+        } else {
+          // something went wrong, abort and navigate to the home page
+          console.error(`Something went wrong during import: ${e}`);
+          navigate('/home');
+        }
+      }
+    }
+  }, [importPayload, importSource]);
+
+  useEffect(() => {
+    if (modalState === 'downloadingContent') {
       importBotContent();
     }
-  }, [modalState, importPayload, importSource]);
+  }, [modalState]);
 
   useEffect(() => {
     if (modalState === 'signingIn') {

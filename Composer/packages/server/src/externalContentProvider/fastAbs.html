@@ -7,7 +7,7 @@
 <script>
     payload = {
         botId: 'absBot1',
-        botName: 'luhan0603-dev',
+        serviceName: 'luhan0603-dev',
         appId: 'testAppId',
         subscriptionId: 'testSubId',
         resourceGroup: 'testResGroup',
@@ -20,9 +20,9 @@
         }
     }
     //
-    importAbsUrl = `bfcomposer://import?source=abs&payload=${encodeURI(JSON.stringify(payload))}`
+    importAbsUrl = `bfcomposer://import?source=abs&payload=${encodeURIComponent(JSON.stringify(payload))}`
 
-    createAbsUrl = `bfcomposer://create?source=abs&payload=${encodeURI(JSON.stringify(payload))}`
+    createAbsUrl = `bfcomposer://create?source=abs&payload=${encodeURIComponent(JSON.stringify(payload))}`
 </script>
 
 <body>

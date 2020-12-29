@@ -68,10 +68,14 @@ async function startImport(req: ImportRequest, res: Response) {
 
       res.status(200).json({ alias, eTag, templateDir, urlSuffix });
     } catch (e) {
-      const msg = 'Error importing bot content: ' + e;
-      const err = new Error(msg);
-      log(err);
-      res.status(500).json({ message: err.stack });
+      if (source === 'abs' && e.status === 404) {
+        res.status(404).json({ payload: metadata });
+      } else {
+        const msg = 'Error importing bot content: ' + e;
+        const err = new Error(msg);
+        log(err);
+        res.status(500).json({ message: err.stack });
+      }
     }
   } else {
     res.status(400).json({ message: 'No content provider found for source: ' + source });
