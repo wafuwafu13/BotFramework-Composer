@@ -284,7 +284,7 @@ export const projectDispatcher = () => {
   });
 
   const createNewBot = useRecoilCallback((callbackHelpers: CallbackInterface) => async (newProjectData: any) => {
-    const { set } = callbackHelpers;
+    const { set, snapshot } = callbackHelpers;
     try {
       await flushExistingTasks(callbackHelpers);
       set(botOpeningState, true);
@@ -300,6 +300,7 @@ export const projectDispatcher = () => {
         urlSuffix,
         alias,
         preserveRoot,
+        profile,
       } = newProjectData;
       const { projectId, mainDialog } = await createNewBotFromTemplate(
         callbackHelpers,
@@ -316,6 +317,16 @@ export const projectDispatcher = () => {
       );
       set(botProjectIdsState, [projectId]);
 
+      if (profile) {
+        // ABS Create Flow, update publishProfile after create project
+        const dispatcher = await snapshot.getPromise(dispatcherState);
+        const newProfile = {
+          name: `${profile.resourceId}-${profile.serviceName}`,
+          type: 'azurePublish',
+          configuration: JSON.stringify({ abs: profile }),
+        };
+        dispatcher.setPublishTargets([newProfile], projectId);
+      }
       // Post project creation
       set(projectMetaDataState(projectId), {
         isRootBot: true,
@@ -350,6 +361,7 @@ export const projectDispatcher = () => {
         urlSuffix,
         alias,
         preserveRoot,
+        profile,
       } = newProjectData;
       // starts the creation process and stores the jobID in state for tracking
       const response = await createNewBotFromTemplateV2(

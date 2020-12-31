@@ -97,6 +97,7 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
     // Alternation: in client's creation modal, create publish profile by using payload in url params
     const appsettingsEntry = zip.getEntry('settings/appsettings.json');
     const appsettings: any = JSON.parse(appsettingsEntry.getData().toString());
+    // TODO: need to update configuration structure as publish schema.
     const newProfile = {
       name: `${this.metadata.resourceId}-${this.metadata.serviceName}`,
       type: 'azurePublish',

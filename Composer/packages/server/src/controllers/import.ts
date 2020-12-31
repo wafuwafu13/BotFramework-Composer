@@ -69,7 +69,11 @@ async function startImport(req: ImportRequest, res: Response) {
       res.status(200).json({ alias, eTag, templateDir, urlSuffix });
     } catch (e) {
       if (source === 'abs' && e.status === 404) {
-        res.status(404).json({ payload: metadata });
+        let alias = '';
+        if (contentProvider.getAlias) {
+          alias = await contentProvider.getAlias();
+        }
+        res.status(404).json({ payload: metadata, alias });
       } else {
         const msg = 'Error importing bot content: ' + e;
         const err = new Error(msg);

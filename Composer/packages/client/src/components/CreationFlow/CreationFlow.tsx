@@ -116,6 +116,7 @@ const CreationFlow: React.FC<CreationFlowProps> = () => {
       urlSuffix: formData.urlSuffix,
       alias: formData.alias,
       preserveRoot: formData.preserveRoot,
+      profile: formData.profile,
     };
     if (templateId === 'conversationalcore') {
       createNewBotV2(newBotData);
@@ -141,11 +142,11 @@ const CreationFlow: React.FC<CreationFlowProps> = () => {
     }
   };
 
-  const handleCreateNext = async (data: string) => {
+  const handleCreateNext = async (data: string, state?: any) => {
     setCreationFlowStatus(CreationFlowStatus.NEW_FROM_TEMPLATE);
     // HACK: has to use absolute path here because of
     //       'bfcomposer://create' triggers the creation flow modal under arbitrary paths besides '/projects/*'
-    navigate(`/projects/create/${data}`);
+    navigate(`/projects/create/${data}`, { state });
   };
 
   return (

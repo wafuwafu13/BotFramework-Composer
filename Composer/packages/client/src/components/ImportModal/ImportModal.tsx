@@ -28,6 +28,20 @@ type ImportedProjectInfo = {
   urlSuffix?: string;
 };
 
+type CreateProjectInfo = {
+  botId: string;
+  serviceName?: string;
+  appId: string;
+  subscriptionId: string;
+  resourceGroup?: string;
+  resourceId?: string;
+  endpoint?: string;
+  // webapp...
+  tag?: {
+    webapp?: string;
+  };
+};
+
 type ImportPayload = {
   name: string;
   description?: string;
@@ -168,9 +182,10 @@ export const ImportModal: React.FC<RouteComponentProps> = (props) => {
         importAsNewProject(projectInfo);
       } catch (e) {
         // if error is no botContent found, then navigate to create new
-        const payload = e.response?.data?.payload;
+        const payload: CreateProjectInfo = e.response?.data?.payload;
         if (importSource === 'abs' && e.response?.status === 404) {
-          navigate(`/projects/create?source=abs&payload=${encodeURI(JSON.stringify(payload))}`);
+          // pass payload through state
+          navigate(`/projects/create`, { state: { profile: payload, alias: e.response?.data?.alias } });
         } else {
           // something went wrong, abort and navigate to the home page
           console.error(`Something went wrong during import: ${e}`);

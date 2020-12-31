@@ -118,7 +118,7 @@ const optionKeys = {
 type CreateOptionsProps = {
   templates: BotTemplate[];
   onDismiss: () => void;
-  onNext: (data: string) => void;
+  onNext: (data: string, payload?: any) => void;
 } & RouteComponentProps<{}>;
 
 export function CreateOptions(props: CreateOptionsProps) {
@@ -176,7 +176,7 @@ export function CreateOptions(props: CreateOptionsProps) {
     }
 
     TelemetryClient.track('CreateNewBotProjectNextButton', { template: routeToTemplate });
-    onNext(routeToTemplate);
+    onNext(routeToTemplate, props.location?.state);
   };
 
   const tableColums = [

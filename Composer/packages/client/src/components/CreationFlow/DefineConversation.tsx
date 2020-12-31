@@ -77,6 +77,7 @@ interface DefineConversationFormData {
   urlSuffix?: string; // url to deep link to after creation
   alias?: string; // identifier that is used to track bots between imports
   preserveRoot?: boolean; // identifier that is used to determine ay project file renames upon creation
+  profile?: any; // when import fail and create a new project, the new project with profile
 }
 
 interface DefineConversationProps
@@ -214,7 +215,7 @@ const DefineConversation: React.FC<DefineConversationProps> = (props) => {
         ...formData,
       };
       if (props.location?.state) {
-        const { alias, eTag, imported, templateDir, urlSuffix } = props.location.state;
+        const { alias, eTag, imported, templateDir, urlSuffix, profile } = props.location.state;
 
         if (imported) {
           dataToSubmit.templateDir = templateDir;
@@ -232,6 +233,9 @@ const DefineConversation: React.FC<DefineConversationProps> = (props) => {
             }),
           });
           addNotification(notification);
+        }
+        if (profile) {
+          dataToSubmit.profile = profile;
         }
       }
 
