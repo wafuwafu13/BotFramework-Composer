@@ -361,7 +361,6 @@ export const projectDispatcher = () => {
         urlSuffix,
         alias,
         preserveRoot,
-        profile,
       } = newProjectData;
       // starts the creation process and stores the jobID in state for tracking
       const response = await createNewBotFromTemplateV2(

@@ -220,7 +220,7 @@ export const ImportModal: React.FC<RouteComponentProps> = (props) => {
   }, [modalState, importSource, importPayload]);
 
   useEffect(() => {
-    if (location && location.href) {
+    if (location?.href) {
       try {
         // parse data from url and store in state
         const url = new URL(location.href);
