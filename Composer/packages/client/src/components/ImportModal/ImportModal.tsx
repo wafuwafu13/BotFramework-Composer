@@ -32,6 +32,7 @@ type CreateProjectInfo = {
   botId: string;
   serviceName?: string;
   appId: string;
+  appPassword: string;
   subscriptionId: string;
   resourceGroup?: string;
   resourceId?: string;

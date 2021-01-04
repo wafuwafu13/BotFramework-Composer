@@ -108,6 +108,7 @@ const schema: JSONSchema7 = {
     name: '<unique name in your subscription>',
     environment: 'dev',
     runtimeIdentifier: 'win-x64',
+    hostname: '<name-environment>',
     settings: {
       applicationInsights: {
         InstrumentationKey: '<Instrumentation Key>',

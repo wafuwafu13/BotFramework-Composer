@@ -27,6 +27,8 @@ export type AzureBotServiceMetadata = IContentProviderMetadata & {
   serviceName?: string;
   /** Azure App Id */
   appId: string;
+  /** Azure App password */
+  appPassword: string;
   /** Azure Subscription Id */
   subscriptionId: string;
   /** Azure resource group Id */
@@ -97,11 +99,12 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
     // Alternation: in client's creation modal, create publish profile by using payload in url params
     const appsettingsEntry = zip.getEntry('settings/appsettings.json');
     const appsettings: any = JSON.parse(appsettingsEntry.getData().toString());
-    // TODO: need to update configuration structure as publish schema.
+    const profile = this.profileMapping();
+
     const newProfile = {
       name: `${this.metadata.resourceId}-${this.metadata.serviceName}`,
       type: 'azurePublish',
-      configuration: JSON.stringify({ abs: this.metadata }),
+      configuration: JSON.stringify(profile),
     };
     if (Array.isArray(appsettings.publishTargets)) {
       appsettings.publishTargets.push(newProfile);
@@ -121,6 +124,20 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
     return await this.getAccessToken();
   }
 
+  private profileMapping() {
+    if (this.metadata) {
+      return {
+        hostname: this.metadata.serviceName,
+        runtimeIdentifier: 'win-x64',
+        settings: {
+          MicrosoftAppId: this.metadata.appId,
+          MicrosoftAppPassword: this.metadata.appPassword,
+        },
+        abs: this.metadata,
+      };
+    }
+    return null;
+  }
   private async getAccessToken(): Promise<string> {
     try {
       // TODO: impl Azure auth

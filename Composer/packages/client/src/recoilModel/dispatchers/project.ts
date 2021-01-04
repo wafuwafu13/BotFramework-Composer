@@ -323,7 +323,15 @@ export const projectDispatcher = () => {
         const newProfile = {
           name: `${profile.resourceId}-${profile.serviceName}`,
           type: 'azurePublish',
-          configuration: JSON.stringify({ abs: profile }),
+          configuration: JSON.stringify({
+            hostname: profile.serviceName,
+            runtimeIdentifier: 'win-x64',
+            settings: {
+              MicrosoftAppId: profile.appId,
+              MicrosoftAppPassword: profile.appPassword,
+            },
+            abs: profile,
+          }),
         };
         dispatcher.setPublishTargets([newProfile], projectId);
       }
