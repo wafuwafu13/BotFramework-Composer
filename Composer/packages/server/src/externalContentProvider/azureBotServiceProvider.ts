@@ -8,6 +8,8 @@ import fetch, { RequestInit } from 'node-fetch';
 import { remove, ensureDirSync } from 'fs-extra';
 import AdmZip from 'adm-zip';
 
+import { authService } from '../services/auth/auth';
+
 import { IContentProviderMetadata, ExternalContentProvider } from './externalContentProvider';
 
 function prettyPrintError(err: string | Error): string {
@@ -141,14 +143,13 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
   private async getAccessToken(): Promise<string> {
     try {
       // TODO: impl Azure auth
-      // const accessToken = await authService.getAccessToken({
-      //   targetResource: 'https://management.core.windows.net/',
-      // });
-      // if (accessToken === '') {
-      //   throw 'User cancelled login flow.';
-      // }
-      // return accessToken;
-      return '';
+      const accessToken = await authService.getAccessToken({
+        targetResource: 'https://management.core.windows.net/',
+      });
+      if (accessToken === '') {
+        throw 'User cancelled login flow.';
+      }
+      return accessToken;
     } catch (error) {
       throw `Error while trying to get access token: ${prettyPrintError(error)}`;
     }
