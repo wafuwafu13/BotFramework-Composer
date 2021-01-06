@@ -216,7 +216,9 @@ export const ProjectTree: React.FC<Props> = ({
   const addMainDialogRef = useCallback((mainDialog) => onboardingAddCoachMarkRef({ mainDialog }), []);
 
   useEffect(() => {
-    setSelectedLink(defaultSelected);
+    if (!isEqual(selectedLink, defaultSelected)) {
+      setSelectedLink(defaultSelected);
+    }
   }, [defaultSelected]);
 
   const rootProjectId = useRecoilValue(rootBotProjectIdSelector);
