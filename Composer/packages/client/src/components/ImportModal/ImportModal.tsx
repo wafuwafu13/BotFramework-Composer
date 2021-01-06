@@ -30,7 +30,7 @@ type ImportedProjectInfo = {
 
 type CreateProjectInfo = {
   botId: string;
-  serviceName?: string;
+  botName?: string;
   appId: string;
   appPassword: string;
   subscriptionId: string;

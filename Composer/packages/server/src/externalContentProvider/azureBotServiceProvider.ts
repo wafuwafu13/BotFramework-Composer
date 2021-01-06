@@ -25,20 +25,22 @@ function prettyPrintError(err: string | Error): string {
 export type AzureBotServiceMetadata = IContentProviderMetadata & {
   /** ABS channel ID */
   botId?: string;
-  /** service name */
-  serviceName?: string;
+  /** bot name */
+  botName?: string;
   /** Azure App Id */
   appId: string;
   /** Azure App password */
   appPassword: string;
   /** Azure Subscription Id */
   subscriptionId: string;
-  /** Azure resource group Id */
+  /** Azure resource group name */
   resourceGroup?: string;
   /** ABS Channel uniq ID */
   resourceId: string;
-  /** Service URI */
-  serviceURI?: string;
+  tag?: {
+    /** serviceName */
+    webapp?: string;
+  };
 };
 
 export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotServiceMetadata> {
@@ -63,7 +65,7 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
       }
 
       ensureDirSync(this.tempBotAssetsDir);
-      const zipPath = join(this.tempBotAssetsDir, `bot-assets-${this.metadata.serviceName}-${Date.now()}.zip`);
+      const zipPath = join(this.tempBotAssetsDir, `bot-assets-${this.metadata.botName}-${Date.now()}.zip`);
       const writeStream = createWriteStream(zipPath);
       await new Promise((resolve, reject) => {
         writeStream.once('finish', resolve);
@@ -104,7 +106,7 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
     const profile = this.profileMapping();
 
     const newProfile = {
-      name: `${this.metadata.resourceId}-${this.metadata.serviceName}`,
+      name: `abs-${this.metadata.botName}`,
       type: 'azurePublish',
       configuration: JSON.stringify(profile),
     };
@@ -129,7 +131,7 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
   private profileMapping() {
     if (this.metadata) {
       return {
-        hostname: this.metadata.serviceName,
+        hostname: this.metadata.tag?.webapp,
         runtimeIdentifier: 'win-x64',
         settings: {
           MicrosoftAppId: this.metadata.appId,
@@ -156,8 +158,8 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
   }
 
   private getBotContentUrl(metadata: AzureBotServiceMetadata) {
-    const { serviceName } = metadata;
-    const botServiceHost = `https://${serviceName}.scm.azurewebsites.net`;
+    const { tag } = metadata;
+    const botServiceHost = `https://${tag?.webapp}.scm.azurewebsites.net`;
     // TODO: make sure the publish profile lives in there.
     const downloadZipUrl = `${botServiceHost}/api/zip/site/wwwroot/ComposerDialogs`;
     return downloadZipUrl;
