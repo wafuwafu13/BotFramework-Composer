@@ -5,7 +5,16 @@
     <title>ABS -> Composer</title>
 </head>
 <script>
-    payload = {
+    payloadcreate = {
+        botId: '123456',
+        botName: 'absBot',
+        appId: 'testAppId',
+        appPassword: 'microsoft app password',
+        subscriptionId: '3e71927d-2914-4c36-bc5d-6369d1f42457',
+        resourceGroup: 'Luhan0603-dev',
+        resourceId: '/subscriptions/3e71927d-2914-4c36-bc5d-6369d1f42457/resourceGroups/Luhan0603-dev/providers/Microsoft.BotService/botServices/Luhan0604',
+    }
+    payloadimport = {
         botId: '123456',
         botName: 'absBot',
         appId: 'testAppId',
@@ -19,9 +28,8 @@
         }
     }
     //
-    importAbsUrl = `bfcomposer://import?source=abs&payload=${encodeURIComponent(JSON.stringify(payload))}`
-
-    createAbsUrl = `bfcomposer://create?source=abs&payload=${encodeURIComponent(JSON.stringify(payload))}`
+    importAbsUrl = `bfcomposer://import?source=abs&payload=${encodeURIComponent(JSON.stringify(payloadimport))}`
+    createAbsUrl = `bfcomposer://import?source=abs&payload=${encodeURIComponent(JSON.stringify(payloadcreate))}`
 </script>
 
 <body>
