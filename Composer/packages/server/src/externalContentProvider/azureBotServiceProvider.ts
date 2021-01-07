@@ -111,7 +111,14 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
       configuration: JSON.stringify(profile),
     };
     if (Array.isArray(appsettings.publishTargets)) {
-      appsettings.publishTargets.push(newProfile);
+      // check existed
+      const origin = appsettings.publishTargets.findIndex((item) => item.name === newProfile.name);
+      if (origin >= 0) {
+        // replace
+        appsettings.publishTargets[origin] = newProfile;
+      } else {
+        appsettings.publishTargets.push(newProfile);
+      }
     } else {
       appsettings.publishTargets = [newProfile];
     }
