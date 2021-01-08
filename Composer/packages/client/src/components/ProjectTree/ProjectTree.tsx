@@ -216,10 +216,8 @@ export const ProjectTree: React.FC<Props> = ({
   const addMainDialogRef = useCallback((mainDialog) => onboardingAddCoachMarkRef({ mainDialog }), []);
 
   useEffect(() => {
-    if (!isEqual(selectedLink, defaultSelected)) {
-      setSelectedLink(defaultSelected);
-    }
-  }, [defaultSelected]);
+    setSelectedLink(defaultSelected);
+  }, [defaultSelected?.projectId, defaultSelected?.skillId, defaultSelected?.dialogId, defaultSelected?.trigger]);
 
   const rootProjectId = useRecoilValue(rootBotProjectIdSelector);
   const projectCollection: TreeDataPerProject[] = useRecoilValue(projectTreeSelector);
