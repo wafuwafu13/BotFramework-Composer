@@ -36,32 +36,27 @@ export const getLanguageFileImports = <T extends { id: string; content: string }
   getFile: (fileId: string) => T
 ): LanguageFileImport[] => {
   const imports: LanguageFileImport[] = [];
-
-  const visitedIds: string[] = [];
-  const fileIds = [rootDialogId];
-
-  while (fileIds.length) {
-    const currentId = fileIds.pop() as string;
-
-    // If this file is already visited, then continue.
-    if (visitedIds.includes(currentId)) {
-      continue;
-    }
-
-    const file = getFile(currentId);
-    // If file is not found or file content is empty, then continue.
-    if (!file || !file.content) {
-      // eslint-disable-next-line no-console
-      console.warn(`Could not find language import file ${currentId}`);
-      continue;
-    }
-    const currentImports = getImportsHelper(file.content);
-    visitedIds.push(currentId);
-    imports.push(...currentImports);
-    const newIds = currentImports.map((ci) => getBaseName(ci.id));
-    fileIds.push(...newIds);
-  }
-
+  // const visitedIds: string[] = [];
+  // const fileIds = [rootDialogId];
+  // while (fileIds.length) {
+  //   const currentId = fileIds.pop() as string;
+  //   // If this file is already visited, then continue.
+  //   if (visitedIds.includes(currentId)) {
+  //     continue;
+  //   }
+  //   const file = getFile(currentId);
+  //   // If file is not found or file content is empty, then continue.
+  //   if (!file || !file.content) {
+  //     // eslint-disable-next-line no-console
+  //     console.warn(`Could not find language import file ${currentId}`);
+  //     continue;
+  //   }
+  //   const currentImports = getImportsHelper(file.content);
+  //   visitedIds.push(currentId);
+  //   imports.push(...currentImports);
+  //   const newIds = currentImports.map((ci) => getBaseName(ci.id));
+  //   fileIds.push(...newIds);
+  // }
   return uniqBy(imports, 'id');
 };
 
