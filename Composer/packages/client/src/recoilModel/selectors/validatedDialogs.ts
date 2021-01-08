@@ -31,7 +31,7 @@ const validateDialogSelectorFamily = selectorFamily({
     const luProvider = getLuProvider(dialogId, recognizers);
     return {
       ...dialog,
-      diagnostics: validateDialog(dialog, schemas.sdk.content, settings, lgFiles, luFiles),
+      diagnostics: [],
       luProvider,
     };
   },
