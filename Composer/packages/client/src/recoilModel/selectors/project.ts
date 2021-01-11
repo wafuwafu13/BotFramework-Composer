@@ -16,7 +16,6 @@ import {
   formDialogSchemaIdsState,
   formDialogSchemaState,
   luFilesState,
-  lgFilesState,
   qnaFilesState,
   skillManifestsState,
   dialogSchemasState,
@@ -32,7 +31,6 @@ import {
 import {
   dialogsSelectorFamily,
   buildEssentialsSelector,
-  validateDialogsSelectorFamily,
   lgImportsSelectorFamily,
   luImportsSelectorFamily,
 } from '../selectors';
@@ -127,9 +125,9 @@ export const botProjectSpaceSelector = selector({
     const botProjects = get(botProjectIdsState);
     const result = botProjects.map((projectId: string) => {
       const { isRemote, isRootBot } = get(projectMetaDataState(projectId));
-      const dialogs = get(validateDialogsSelectorFamily(projectId));
+      const dialogs = get(dialogsSelectorFamily(projectId));
       const luFiles = get(luFilesState(projectId));
-      const lgFiles = get(lgFilesState(projectId));
+      const lgFiles = get(lgFilesSelectorFamily(projectId));
       const qnaFiles = get(qnaFilesState(projectId));
       const formDialogSchemas = get(formDialogSchemasSelectorFamily(projectId));
       const botProjectFile = get(botProjectFileState(projectId));

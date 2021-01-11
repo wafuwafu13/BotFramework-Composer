@@ -2,52 +2,31 @@
 // Licensed under the MIT License.
 
 import { selectorFamily } from 'recoil';
+import { DialogInfo, BotSchemas, LgFile, DialogSetting, RecognizerFile, Diagnostic } from '@bfc/shared';
 import { validateDialog } from '@bfc/indexers';
-import { DialogInfo, BotSchemas, LgFile, LuFile, DialogSetting, RecognizerFile } from '@bfc/shared';
 
-import {
-  botProjectIdsState,
-  dialogIdsState,
-  schemasState,
-  lgFilesState,
-  luFilesState,
-  dialogState,
-  settingsState,
-} from '../atoms';
+import { schemasState, dialogState, settingsState, localeState, lgFileState } from '../atoms';
 import { getLuProvider } from '../../utils/dialogUtil';
 
 import { recognizersSelectorFamily } from './recognizers';
 
 type validateDialogSelectorFamilyParams = { projectId: string; dialogId: string };
-const validateDialogSelectorFamily = selectorFamily({
-  key: 'validateDialogSelectorFamily',
+export const dialogLuProviderSelectorFamily = selectorFamily({
+  key: 'dialogLuProviderSelectorFamily',
   get: ({ projectId, dialogId }: validateDialogSelectorFamilyParams) => ({ get }) => {
-    const dialog: DialogInfo = get(dialogState({ projectId, dialogId }));
-    const schemas: BotSchemas = get(schemasState(projectId));
-    const lgFiles: LgFile[] = get(lgFilesState(projectId));
-    const luFiles: LuFile[] = get(luFilesState(projectId));
-    const settings: DialogSetting = get(settingsState(projectId));
     const recognizers: RecognizerFile[] = get(recognizersSelectorFamily(projectId));
-    const luProvider = getLuProvider(dialogId, recognizers);
-    return {
-      ...dialog,
-      diagnostics: [],
-      luProvider,
-    };
+    return getLuProvider(dialogId, recognizers);
   },
 });
 
-export const validateDialogsSelectorFamily = selectorFamily({
-  key: 'validateDialogsSelectorFamily',
-  get: (projectId: string) => ({ get }) => {
-    const loadedProjects = get(botProjectIdsState);
-    if (!loadedProjects.includes(projectId)) {
-      return [];
-    }
-    const dialogIds = get(dialogIdsState(projectId));
-
-    return dialogIds.map((dialogId) => {
-      return get(validateDialogSelectorFamily({ projectId, dialogId }));
-    });
+export const dialogDiagnosticsSelectorFamily = selectorFamily({
+  key: 'dialogDiagnosticsSelectorFamily',
+  get: ({ projectId, dialogId }: validateDialogSelectorFamilyParams) => ({ get }) => {
+    const dialog: DialogInfo = get(dialogState({ projectId, dialogId }));
+    const schemas: BotSchemas = get(schemasState(projectId));
+    const locale = get(localeState(projectId));
+    const lgFile: LgFile = get(lgFileState({ projectId, lgFileId: `${dialogId}.${locale}` }));
+    const settings: DialogSetting = get(settingsState(projectId));
+    return validateDialog(dialog, schemas.sdk.content, settings, [lgFile], []) as Diagnostic[];
   },
 });
