@@ -14,8 +14,8 @@ import { JsonEditor } from '@bfc/code-editor';
 import { EditorExtension, PluginConfig } from '@bfc/extension-client';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { OpenConfirmModal } from '@bfc/ui-shared';
+import { Split, SplitMeasuredSizes } from '@geoffcox/react-splitter';
 
-import { LeftRightSplit } from '../../components/Split/LeftRightSplit';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { DialogDeleting } from '../../constants';
 import { createSelectedPath, deleteTrigger as DialogdeleteTrigger, getDialogData } from '../../utils/dialogUtil';
@@ -57,6 +57,7 @@ import { undoStatusSelectorFamily } from '../../recoilModel/selectors/undo';
 import { DiagnosticsHeader } from '../../components/DiagnosticsHeader';
 import { createQnAOnState, exportSkillModalInfoState } from '../../recoilModel/atoms/appState';
 import TelemetryClient from '../../telemetry/TelemetryClient';
+import { renderThinSplitter } from '../../components/Split/ThinSplitter';
 
 import CreationModal from './creationModal';
 import { WarningMessage } from './WarningMessage';
@@ -190,13 +191,15 @@ const DesignPage: React.FC<RouteComponentProps<{ dialogId: string; projectId: st
   const [brokenSkillInfo, setBrokenSkillInfo] = useState<undefined | TreeLink>(undefined);
   const [brokenSkillRepairCallback, setBrokenSkillRepairCallback] = useState<undefined | (() => void)>(undefined);
   const [dialogJsonVisible, setDialogJsonVisibility] = useState(false);
-  const [currentDialog, setCurrentDialog] = useState<DialogInfo>(dialogs[0] as DialogInfo);
   const [warningIsVisible, setWarningIsVisible] = useState(true);
   const [breadcrumbs, setBreadcrumbs] = useState<Array<BreadcrumbItem>>([]);
 
   const shell = useShell('DesignPage', skillId ?? rootProjectId);
   const shellForFlowEditor = useShell('FlowEditor', skillId ?? rootProjectId);
   const shellForPropertyEditor = useShell('PropertyEditor', skillId ?? rootProjectId);
+  const currentDialog = (dialogs.find(({ id }) => id === dialogId) ?? dialogs[0]) as DialogInfo;
+
+  const { setPageElementState } = useRecoilValue(dispatcherState);
 
   useEffect(() => {
     if (!skillId) return;
@@ -207,11 +210,9 @@ const DesignPage: React.FC<RouteComponentProps<{ dialogId: string; projectId: st
   }, [skills, skillId]);
 
   useEffect(() => {
-    const currentDialog = dialogs.find(({ id }) => id === dialogId) as DialogInfo | undefined;
-    if (currentDialog) {
-      setCurrentDialog(currentDialog);
+    if (!warningIsVisible) {
+      setWarningIsVisible(true);
     }
-    setWarningIsVisible(true);
   }, [dialogId, dialogs, location]);
 
   // migration: add id to dialog when dialog doesn't have id
@@ -699,10 +700,22 @@ const DesignPage: React.FC<RouteComponentProps<{ dialogId: string; projectId: st
   const withWarning = triggerNotSupported(currentDialog, selectedTrigger);
   const dialogCreateSource = dialogModalInfo ?? skillId ?? projectId;
 
+  const onMeasuredSizesChanged = (sizes: SplitMeasuredSizes) => {
+    setPageElementState('dialogs', { leftSplitWidth: sizes.primary });
+  };
+
   return (
     <React.Fragment>
       <div css={pageRoot}>
-        <LeftRightSplit initialLeftGridWidth="20%" minLeftPixels={200} minRightPixels={800} pageMode={'dialogs'}>
+        <Split
+          resetOnDoubleClick
+          initialPrimarySize="20%"
+          minPrimarySize="200px"
+          minSecondarySize="800px"
+          renderSplitter={renderThinSplitter}
+          splitterSize="5px"
+          onMeasuredSizesChanged={onMeasuredSizesChanged}
+        >
           <ProjectTree
             defaultSelected={{
               projectId,
@@ -736,11 +749,12 @@ const DesignPage: React.FC<RouteComponentProps<{ dialogId: string; projectId: st
             </div>
             <Conversation css={editorContainer}>
               <div css={editorWrapper}>
-                <LeftRightSplit
-                  initialLeftGridWidth="65%"
-                  minLeftPixels={500}
-                  minRightPixels={350}
-                  pageMode={'dialogs'}
+                <Split
+                  resetOnDoubleClick
+                  initialPrimarySize="65%"
+                  minPrimarySize="500px"
+                  minSecondarySize="350px"
+                  renderSplitter={renderThinSplitter}
                 >
                   <div aria-label={formatMessage('Authoring canvas')} css={visualPanel} role="region">
                     {!isRemoteSkill ? breadcrumbItems : null}
@@ -786,11 +800,11 @@ const DesignPage: React.FC<RouteComponentProps<{ dialogId: string; projectId: st
                       <PropertyEditor key={focusPath + undoVersion} />
                     )}
                   </EditorExtension>
-                </LeftRightSplit>
+                </Split>
               </div>
             </Conversation>
           </div>
-        </LeftRightSplit>
+        </Split>
       </div>
       <Suspense fallback={<LoadingSpinner />}>
         {showCreateDialogModal && (
