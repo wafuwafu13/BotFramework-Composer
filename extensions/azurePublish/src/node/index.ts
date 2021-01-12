@@ -250,7 +250,7 @@ export default async (composer: IExtensionRegistration): Promise<void> => {
       resourcekey: string,
       customizeConfiguration: DeployResources
     ) => {
-      const { subscriptionID, accessToken, name, environment, hostname, luisResource, abs } = customizeConfiguration;
+      const { accessToken, name, environment, hostname, luisResource, abs } = customizeConfiguration;
       // Create the BotProjectDeploy object, which is used to carry out the deploy action.
       const azDeployer = new BotProjectDeploy({
         logger: (msg: any, ...args: any[]) => {

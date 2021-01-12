@@ -209,10 +209,22 @@ export class BotProjectDeploy {
    * @param hostname the hostname of webapp which bot service would be linked to
    */
   private async linkBotWithWebapp(absSettings: any, hostname: string) {
-    if (!absSettings.subscriptionId || !absSettings.resourceGroup || !absSettings.botName || !hostname) {
+    let subscriptionId = '', resourceGroupName = '', botName = '';
+    if (!absSettings.resourceId || !hostname) {
       this.logger({
         status: BotProjectDeployLoggerType.DEPLOY_INFO,
         message: 'Abs settings incomplete, skip linking bot with webapp ...'
+      });
+      return;
+    }
+    try {
+      subscriptionId  = absSettings.resourceId.match(/subscriptions\/([\w-]*)\//)[1];
+      resourceGroupName  = absSettings.resourceId.match(/resourceGroups\/([^\/]*)/)[1];
+      botName  = absSettings.resourceId.match(/botServices\/([^\/]*)/)[1];
+    } catch (error) {
+      this.logger({
+        status: BotProjectDeployLoggerType.DEPLOY_INFO,
+        message: 'Abs settings resourceId is incomplete, skip linking bot with webapp ...'
       });
       return;
     }
@@ -221,10 +233,6 @@ export class BotProjectDeploy {
       status: BotProjectDeployLoggerType.DEPLOY_INFO,
       message: 'Linking bot with webapp ...'
     });
-
-    const subscriptionId = absSettings.subscriptionId;
-    const resourceGroupName = absSettings.resourceGroup;
-    const botName = absSettings.botName;
 
     const creds = new TokenCredentials(this.accessToken);
     const azureBotSerivce = new AzureBotService(creds, subscriptionId);
