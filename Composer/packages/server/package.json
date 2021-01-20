@@ -56,6 +56,8 @@
     "ts-node": "^8.4.1"
   },
   "dependencies": {
+    "@azure/identity": "^1.2.2",
+    "@azure/keyvault-secrets": "^4.1.0",
     "@azure/msal-node": "^1.0.0-beta.1",
     "@bfc/client": "*",
     "@bfc/extension": "*",

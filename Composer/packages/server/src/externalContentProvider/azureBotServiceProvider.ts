@@ -7,6 +7,8 @@ import { createWriteStream } from 'fs';
 import fetch, { RequestInit } from 'node-fetch';
 import { remove, ensureDirSync } from 'fs-extra';
 import AdmZip from 'adm-zip';
+// import { DefaultAzureCredential } from '@azure/identity';
+// import { SecretClient } from '@azure/keyvault-secrets';
 
 import { authService } from '../services/auth/auth';
 
@@ -16,7 +18,7 @@ function prettyPrintError(err: string | Error): string {
   if (typeof err === 'string') {
     return err;
   }
-  if (err && err.message) {
+  if (err?.message) {
     return err.message;
   }
   return '';
@@ -37,7 +39,7 @@ export type AzureBotServiceMetadata = IContentProviderMetadata & {
   resourceGroup?: string;
   /** ABS Channel uniq ID */
   resourceId: string;
-  tag?: {
+  tags?: {
     /** serviceName */
     webapp?: string;
   };
@@ -52,36 +54,46 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
   }
 
   public async downloadBotContent() {
-    const url = this.getBotContentUrl(this.metadata);
     const options: RequestInit = {
       method: 'GET',
       headers: await this.getRequestHeaders(),
     };
 
-    try {
-      const result = await fetch(url, options);
-      if (!result || !result.body) {
-        throw new Error('Response containing zip does not have a body');
-      }
+    // get key vault
+    // const keyvaultName = 'composertest';
+    // const keyvaultUrl = `https://${keyvaultName}.vault.azure.net`;
+    // const credential = new DefaultAzureCredential();
+    // const client = new SecretClient(keyvaultUrl, credential);
 
-      ensureDirSync(this.tempBotAssetsDir);
-      const zipPath = join(this.tempBotAssetsDir, `bot-assets-${this.metadata.botName}-${Date.now()}.zip`);
-      const writeStream = createWriteStream(zipPath);
-      await new Promise((resolve, reject) => {
-        writeStream.once('finish', resolve);
-        writeStream.once('error', reject);
-        result.body.pipe(writeStream);
-      });
-      await this.syncWithProjectContent(zipPath);
+    // const secretName = 'MicrosoftAppPassword';
+    // const secrets = await client.getSecret(secretName);
+    // console.log(secrets.value);
 
-      return {
-        zipPath: zipPath,
-        eTag: '',
-        urlSuffix: this.getDeepLink(),
-      };
-    } catch (error) {
-      throw { message: error.message, status: 404 };
+    // download
+    if (!this.metadata.tags || !this.metadata.tags.webapp) {
+      throw { message: 'No webapp available', status: 404 };
     }
+    const url = this.getBotContentUrl(this.metadata);
+    const result = await fetch(url, options);
+    if (!result || !result.body) {
+      throw new Error('Response containing zip does not have a body');
+    }
+
+    ensureDirSync(this.tempBotAssetsDir);
+    const zipPath = join(this.tempBotAssetsDir, `bot-assets-${this.metadata.botName}-${Date.now()}.zip`);
+    const writeStream = createWriteStream(zipPath);
+    await new Promise((resolve, reject) => {
+      writeStream.once('finish', resolve);
+      writeStream.once('error', reject);
+      result.body.pipe(writeStream);
+    });
+    await this.syncWithProjectContent(zipPath);
+
+    return {
+      zipPath: zipPath,
+      eTag: '',
+      urlSuffix: this.getDeepLink(),
+    };
   }
 
   public async cleanUp() {
@@ -138,7 +150,7 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
   private profileMapping() {
     if (this.metadata) {
       return {
-        hostname: this.metadata.tag?.webapp,
+        hostname: this.metadata.tags?.webapp,
         runtimeIdentifier: 'win-x64',
         settings: {
           MicrosoftAppId: this.metadata.appId,
@@ -165,8 +177,8 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
   }
 
   private getBotContentUrl(metadata: AzureBotServiceMetadata) {
-    const { tag } = metadata;
-    const botServiceHost = `https://${tag?.webapp}.scm.azurewebsites.net`;
+    const { tags } = metadata;
+    const botServiceHost = `https://${tags?.webapp}.scm.azurewebsites.net`;
     // TODO: make sure the publish profile lives in there.
     const downloadZipUrl = `${botServiceHost}/api/zip/site/wwwroot/ComposerDialogs`;
     return downloadZipUrl;

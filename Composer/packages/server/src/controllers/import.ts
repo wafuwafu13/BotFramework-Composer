@@ -68,18 +68,20 @@ async function startImport(req: ImportRequest, res: Response) {
 
       res.status(200).json({ alias, eTag, templateDir, urlSuffix });
     } catch (e) {
-      if (source === 'abs' && e.status === 404) {
+      // return 404 if catch a customize error
+      if (source === 'abs' && !(e instanceof Error) && typeof e === 'object' && e.status === 404) {
         let alias = '';
         if (contentProvider.getAlias) {
           alias = await contentProvider.getAlias();
         }
         res.status(404).json({ payload: metadata, alias });
-      } else {
-        const msg = 'Error importing bot content: ' + e;
-        const err = new Error(msg);
-        log(err);
-        res.status(500).json({ message: err.stack });
+        return;
       }
+
+      const msg = 'Error importing bot content: ' + e;
+      const err = new Error(msg);
+      log(err);
+      res.status(500).json({ message: err.stack });
     }
   } else {
     res.status(400).json({ message: 'No content provider found for source: ' + source });
