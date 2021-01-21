@@ -9,7 +9,7 @@ import { Debugger } from 'debug';
 import { IBotProject, PublishPlugin, JSONSchema7, IExtensionRegistration, PublishResponse, PublishResult } from '@botframework-composer/types';
 import { AzureResourceTypes, AzureResourceDefinitions } from './resourceTypes';
 import { mergeDeep } from './mergeDeep';
-import { BotProjectDeploy } from './deploy';
+import { BotProjectDeploy, isProfileComplete } from './deploy';
 import { BotProjectProvision } from './provision';
 import { BackgroundProcessManager } from './backgroundProcessManager';
 import { ProvisionConfig } from './provision';
@@ -39,6 +39,18 @@ interface PublishConfig {
   fullSettings: any;
   profileName: string; //profile name
   [key: string]: any;
+}
+
+interface PublishProfile {
+  name:string;
+  environment:string;
+  hostname:string;
+  settings:{
+    MicrosoftAppId: string;
+    MicrosoftAppPassword: string;
+    [key:string]:any;
+  };
+  [key:string]:any;
 }
 
 interface ResourceType {
@@ -433,7 +445,6 @@ export default async (composer: IExtensionRegistration): Promise<void> => {
         // these are specific to the azure publish profile shape
         name,
         environment = 'composer',
-        settings,
       } = config;
 
       const {luResources, qnaResources} = metadata;
@@ -461,9 +472,8 @@ export default async (composer: IExtensionRegistration): Promise<void> => {
         if (!accessToken) {
           throw new Error('Required field `accessToken` is missing from publishing profile.');
         }
-        if (!settings) {
-          throw new Error('Required field `settings` is missing from publishing profile.');
-        }
+        // verify publish profile
+        isProfileComplete(config);
 
         this.asyncPublish({...config, accessToken, luResources, qnaResources}, project, resourcekey, jobId);
 
