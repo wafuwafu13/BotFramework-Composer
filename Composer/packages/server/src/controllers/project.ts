@@ -5,6 +5,7 @@ import { Request, Response } from 'express';
 import { Archiver } from 'archiver';
 import { remove } from 'fs-extra';
 import formatMessage from 'format-message';
+import set from 'lodash/set';
 
 import { ExtensionContext } from '../models/extension/extensionContext';
 import log from '../logger';
@@ -216,6 +217,9 @@ async function saveProjectAs(req: Request, res: Response) {
     const currentProject = await BotProjectService.getProjectById(id, user);
     if (currentProject !== undefined) {
       await currentProject.updateBotInfo(name, description);
+      const settings = await currentProject.settingManager.get(false);
+      set(settings, 'luis.name', name);
+      await currentProject.updateFile('appsettings.json', JSON.stringify(settings));
       await currentProject.init();
       const project = currentProject.getProject();
       res.status(200).json({
