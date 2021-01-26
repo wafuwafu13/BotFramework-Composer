@@ -26,6 +26,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -282,6 +283,11 @@ namespace Microsoft.BotFramework.Composer.Functions
             // Config precedence 2: ComposerDialogs/settings settings which are injected by the composer publish.
             var configFile = Path.GetFullPath(Path.Combine(assetsDirectory.FullName, SettingsRelativePath));
             config.AddJsonFile(configFile, optional: true, reloadOnChange: true);
+
+            string password = Environment.GetEnvironmentVariable("MicrosoftAppPassword");
+            var configuration = config.Build();
+            configuration["MicrosoftAppPassword"] = password;
+
 
             config.UseComposerSettings();
 

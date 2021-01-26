@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.BotFramework.Composer.Core;
@@ -31,6 +32,9 @@ namespace Microsoft.BotFramework.Composer.WebAppTemplates
                 var configFile = Path.GetFullPath(Path.Combine(botRoot, @"settings/appsettings.json"));
 
                 builder.AddJsonFile(configFile, optional: true, reloadOnChange: true);
+
+                string password = Environment.GetEnvironmentVariable("MicrosoftAppPassword");
+                configuration["MicrosoftAppPassword"] = password;
 
                 // Use Composer luis and qna settings extensions
                 builder.UseComposerSettings();
