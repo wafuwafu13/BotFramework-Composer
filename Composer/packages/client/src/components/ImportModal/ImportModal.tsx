@@ -17,13 +17,12 @@ import { ImportStatus } from './ImportStatus';
 import { ImportSuccessNotificationWrapper } from './ImportSuccessNotification';
 import { ImportPromptToSaveModal } from './ImportPromptToSaveModal';
 import { ImportFailedModal } from './ImportFailedModal';
-
 type ImportedProjectInfo = {
   alias?: string;
   description?: string;
   eTag: string;
   name?: string;
-  source: string;
+  source?: string;
   templateDir: string;
   urlSuffix?: string;
   profile?: any;
@@ -87,7 +86,8 @@ export const ImportModal: React.FC<RouteComponentProps> = (props) => {
       urlSuffix,
       profile,
     };
-    let creationUrl = `/projects/create/${encodeURIComponent(source)}`;
+    // get template by source
+    let creationUrl = source ? `/projects/create/${encodeURIComponent(source)}` : '/projects/create';
 
     const searchParams = new URLSearchParams();
     if (name) {
@@ -99,7 +99,6 @@ export const ImportModal: React.FC<RouteComponentProps> = (props) => {
     if (searchParams.toString()) {
       creationUrl += `?${searchParams.toString()}`;
     }
-
     navigate(creationUrl, { state });
   }, []);
 
@@ -172,7 +171,7 @@ export const ImportModal: React.FC<RouteComponentProps> = (props) => {
             alias: e.response?.data?.alias,
             templateDir: '',
             eTag: '',
-            source: 'abs',
+            source: '',
           };
         } else {
           // something went wrong, abort and navigate to the home page
@@ -196,8 +195,12 @@ export const ImportModal: React.FC<RouteComponentProps> = (props) => {
         if (aliasRes.status === 200) {
           const project = aliasRes.data;
           setExistingProject(project);
-          // ask user if they want to save to existing, or save as a new project
-          setModalState('promptingToSave');
+          if (importSource === 'abs') {
+            navigate(`/bot/${project.id}`);
+          } else {
+            // ask user if they want to save to existing, or save as a new project
+            setModalState('promptingToSave');
+          }
           return;
         }
       }

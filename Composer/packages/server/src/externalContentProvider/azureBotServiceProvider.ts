@@ -7,22 +7,20 @@ import { createWriteStream } from 'fs';
 import fetch, { RequestInit } from 'node-fetch';
 import { remove, ensureDirSync } from 'fs-extra';
 import AdmZip from 'adm-zip';
-// import { DefaultAzureCredential } from '@azure/identity';
-// import { SecretClient } from '@azure/keyvault-secrets';
 
-import { authService } from '../services/auth/auth';
+// import { authService } from '../services/auth/auth';
 
 import { IContentProviderMetadata, ExternalContentProvider } from './externalContentProvider';
 
-function prettyPrintError(err: string | Error): string {
-  if (typeof err === 'string') {
-    return err;
-  }
-  if (err?.message) {
-    return err.message;
-  }
-  return '';
-}
+// function prettyPrintError(err: string | Error): string {
+//   if (typeof err === 'string') {
+//     return err;
+//   }
+//   if (err?.message) {
+//     return err.message;
+//   }
+//   return '';
+// }
 
 export type AzureBotServiceMetadata = IContentProviderMetadata & {
   /** ABS channel ID */
@@ -31,8 +29,8 @@ export type AzureBotServiceMetadata = IContentProviderMetadata & {
   botName?: string;
   /** Azure App Id */
   appId: string;
-  /** Azure App password */
-  appPassword: string;
+  /** keyvault id for Azure App password */
+  appPasswordHint: string;
   /** Azure Subscription Id */
   subscriptionId: string;
   /** Azure resource group name */
@@ -58,16 +56,6 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
       method: 'GET',
       headers: await this.getRequestHeaders(),
     };
-
-    // get key vault
-    // const keyvaultName = 'composertest';
-    // const keyvaultUrl = `https://${keyvaultName}.vault.azure.net`;
-    // const credential = new DefaultAzureCredential();
-    // const client = new SecretClient(keyvaultUrl, credential);
-
-    // const secretName = 'MicrosoftAppPassword';
-    // const secrets = await client.getSecret(secretName);
-    // console.log(secrets.value);
 
     // download
     if (!this.metadata.tags || !this.metadata.tags.webapp) {
@@ -141,7 +129,8 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
 
   public async getAlias() {
     // To load correct project, alias should be project name as the project's URI.
-    return `abs-${this.botName}`;
+    console.log(this.botName);
+    return `abs-${this.metadata.botName}-${this.metadata.appId}`;
   }
   public async authenticate() {
     return await this.getAccessToken();
@@ -154,7 +143,7 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
         runtimeIdentifier: 'win-x64',
         settings: {
           MicrosoftAppId: this.metadata.appId,
-          MicrosoftAppPassword: this.metadata.appPassword,
+          MicrosoftAppPassword: this.metadata.appPassword || '',
         },
         abs: this.metadata,
       };
@@ -162,18 +151,19 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
     return null;
   }
   private async getAccessToken(): Promise<string> {
-    try {
-      // TODO: impl Azure auth
-      const accessToken = await authService.getAccessToken({
-        targetResource: 'https://management.core.windows.net/',
-      });
-      if (accessToken === '') {
-        throw 'User cancelled login flow.';
-      }
-      return accessToken;
-    } catch (error) {
-      throw `Error while trying to get access token: ${prettyPrintError(error)}`;
-    }
+    return 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Im5PbzNaRHJPRFhFSzFqS1doWHNsSFJfS1hFZyIsImtpZCI6Im5PbzNaRHJPRFhFSzFqS1doWHNsSFJfS1hFZyJ9.eyJhdWQiOiJodHRwczovL21hbmFnZW1lbnQuY29yZS53aW5kb3dzLm5ldC8iLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC83MmY5ODhiZi04NmYxLTQxYWYtOTFhYi0yZDdjZDAxMWRiNDcvIiwiaWF0IjoxNjExNjQ2MTM0LCJuYmYiOjE2MTE2NDYxMzQsImV4cCI6MTYxMTY1MDAzNCwiX2NsYWltX25hbWVzIjp7Imdyb3VwcyI6InNyYzEifSwiX2NsYWltX3NvdXJjZXMiOnsic3JjMSI6eyJlbmRwb2ludCI6Imh0dHBzOi8vZ3JhcGgud2luZG93cy5uZXQvNzJmOTg4YmYtODZmMS00MWFmLTkxYWItMmQ3Y2QwMTFkYjQ3L3VzZXJzLzhhZGU1NWQ3LWE1MzYtNDE2NS1hYTJmLTgwZWNmNzBjMzZmMy9nZXRNZW1iZXJPYmplY3RzIn19LCJhY3IiOiIxIiwiYWlvIjoiQVVRQXUvOFNBQUFBZWZnc1kycXA4NXJGTlZsQXZqbXpzNHE4Vjk1TWpkS2doOVVVcFpSbjVxeTZVUkRBQ3RvNEJ3Q2pqWGZMSXZmQzlDdHMzVVVDNDdLNkJPQW5xS0JuZVE9PSIsImFtciI6WyJyc2EiLCJtZmEiXSwiYXBwaWQiOiIwNGIwNzc5NS04ZGRiLTQ2MWEtYmJlZS0wMmY5ZTFiZjdiNDYiLCJhcHBpZGFjciI6IjAiLCJkZXZpY2VpZCI6ImZiZTI0ZWI0LTI2YTItNGNkZC05YmE0LTE4ZjNmNGEyMWJmNyIsImZhbWlseV9uYW1lIjoiTHVvIiwiZ2l2ZW5fbmFtZSI6IldlbnlpIiwiaXBhZGRyIjoiMTY3LjIyMC4yMzMuMSIsIm5hbWUiOiJXZW55aSBMdW8iLCJvaWQiOiI4YWRlNTVkNy1hNTM2LTQxNjUtYWEyZi04MGVjZjcwYzM2ZjMiLCJvbnByZW1fc2lkIjoiUy0xLTUtMjEtMjE0Njc3MzA4NS05MDMzNjMyODUtNzE5MzQ0NzA3LTIyNTAzNzIiLCJwdWlkIjoiMTAwM0JGRkRBMjg4MEZGMSIsInJoIjoiMC5BUm9BdjRqNWN2R0dyMEdScXkxODBCSGJSNVYzc0FUYmpScEd1LTRDLWVHX2UwWWFBT0EuIiwic2NwIjoidXNlcl9pbXBlcnNvbmF0aW9uIiwic3ViIjoiOHRZQ1V6WndWMmlXVHNxYlFxVkVLME1NWFlSSzZMMkNBVTY2VU14ekt2MCIsInRpZCI6IjcyZjk4OGJmLTg2ZjEtNDFhZi05MWFiLTJkN2NkMDExZGI0NyIsInVuaXF1ZV9uYW1lIjoid2VueWx1b0BtaWNyb3NvZnQuY29tIiwidXBuIjoid2VueWx1b0BtaWNyb3NvZnQuY29tIiwidXRpIjoicEk4SEZ0UFdja2FZTFdiUnY2Y05BUSIsInZlciI6IjEuMCIsIndpZHMiOlsiYjc5ZmJmNGQtM2VmOS00Njg5LTgxNDMtNzZiMTk0ZTg1NTA5Il0sInhtc190Y2R0IjoxMjg5MjQxNTQ3fQ.Pq94w2JOQlzGgIvrsWrrzWllg-Pne8uxfwVT5ygJfzyJVJhn8qSaKpTpJD3EsQp-XTTY2j3vdmlS0r2ptTjKbb-qA4wEVU3d6nplzWVsoWJ7X6KZ-aFW88mE9FfOYUtFXe-o-EKgzZPGRLcBsgq314MGFnBmH8pyGdYDzq8WGx3YVnEQZw3PENJm98WdPJFkNoSbM2KtQDekKaajslr7__EFmRkSWBUNpCEDwlg4VUUiGjUOQX9dlsyUYlCNtzxIu8ssfyC1i77htCHjrt7oA8wQ-bIWrL-ShlfpaHpyub1cr6HsSf-YApRswvt2azdXxOiE1EaAZRVVj5-clKAq8w';
+    // try {
+    //   // TODO: impl Azure auth
+    //   const accessToken = await authService.getAccessToken({
+    //     targetResource: 'https://management.core.windows.net/',
+    //   });
+    //   if (accessToken === '') {
+    //     throw 'User cancelled login flow.';
+    //   }
+    //   return accessToken;
+    // } catch (error) {
+    //   throw `Error while trying to get access token: ${prettyPrintError(error)}`;
+    // }
   }
 
   private getBotContentUrl(metadata: AzureBotServiceMetadata) {
