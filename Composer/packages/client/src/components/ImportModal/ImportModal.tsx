@@ -17,15 +17,15 @@ import { ImportStatus } from './ImportStatus';
 import { ImportSuccessNotificationWrapper } from './ImportSuccessNotification';
 import { ImportPromptToSaveModal } from './ImportPromptToSaveModal';
 import { ImportFailedModal } from './ImportFailedModal';
-
 type ImportedProjectInfo = {
   alias?: string;
   description?: string;
   eTag: string;
   name?: string;
-  source: string;
+  source?: string;
   templateDir: string;
   urlSuffix?: string;
+  profile?: any;
 };
 
 type CreateProjectInfo = {
@@ -77,15 +77,17 @@ export const ImportModal: React.FC<RouteComponentProps> = (props) => {
 
   const importAsNewProject = useCallback((info: ImportedProjectInfo) => {
     // navigate to creation flow with template selected
-    const { alias, description, eTag, name, source, templateDir, urlSuffix } = info;
+    const { alias, description, eTag, name, source, templateDir, urlSuffix, profile } = info;
     const state = {
       alias,
       eTag,
       imported: true,
       templateDir,
       urlSuffix,
+      profile,
     };
-    let creationUrl = `/projects/create/${encodeURIComponent(source)}`;
+    // get template by source
+    let creationUrl = source ? `/projects/create/${encodeURIComponent(source)}` : '/projects/create';
 
     const searchParams = new URLSearchParams();
     if (name) {
@@ -97,7 +99,6 @@ export const ImportModal: React.FC<RouteComponentProps> = (props) => {
     if (searchParams.toString()) {
       creationUrl += `?${searchParams.toString()}`;
     }
-
     navigate(creationUrl, { state });
   }, []);
 
@@ -142,15 +143,15 @@ export const ImportModal: React.FC<RouteComponentProps> = (props) => {
   }, [existingProject, importedProjectInfo]);
 
   const importBotContent = useCallback(async () => {
-    if (location && location.href) {
+    if (location?.href) {
+      let projectInfo: ImportedProjectInfo | undefined;
       try {
         const { description, name } = importPayload;
-
         const res = await axios.post<{ alias: string; eTag: string; templateDir: string; urlSuffix: string }>(
           `/api/import/${importSource}?payload=${encodeURIComponent(JSON.stringify(importPayload))}`
         );
         const { alias, eTag, templateDir, urlSuffix } = res.data;
-        const projectInfo = {
+        projectInfo = {
           description,
           name,
           templateDir,
@@ -160,39 +161,50 @@ export const ImportModal: React.FC<RouteComponentProps> = (props) => {
           alias,
         };
         setImportedProjectInfo(projectInfo);
-
-        if (alias) {
-          // check to see if Composer currently has a bot project corresponding to the alias
-          const aliasRes = await axios.get<any>(`/api/projects/alias/${alias}`, {
-            validateStatus: (status) => {
-              // a 404 should fall through
-              if (status === 404) {
-                return true;
-              }
-              return status >= 200 && status < 300;
-            },
-          });
-          if (aliasRes.status === 200) {
-            const project = aliasRes.data;
-            setExistingProject(project);
-            // ask user if they want to save to existing, or save as a new project
-            setModalState('promptingToSave');
-            return;
-          }
-        }
-        importAsNewProject(projectInfo);
       } catch (e) {
         // if error is no botContent found, then navigate to create new
         const payload: CreateProjectInfo = e.response?.data?.payload;
         if (importSource === 'abs' && e.response?.status === 404) {
           // pass payload through state
-          navigate(`/projects/create`, { state: { profile: payload, alias: e.response?.data?.alias } });
+          projectInfo = {
+            profile: payload,
+            alias: e.response?.data?.alias,
+            templateDir: '',
+            eTag: '',
+            source: '',
+          };
         } else {
           // something went wrong, abort and navigate to the home page
           console.error(`Something went wrong during import: ${e}`);
           navigate('/home');
+          return;
         }
       }
+
+      if (projectInfo.alias) {
+        // check to see if Composer currently has a bot project corresponding to the alias
+        const aliasRes = await axios.get<any>(`/api/projects/alias/${projectInfo.alias}`, {
+          validateStatus: (status) => {
+            // a 404 should fall through
+            if (status === 404) {
+              return true;
+            }
+            return status >= 200 && status < 300;
+          },
+        });
+        if (aliasRes.status === 200) {
+          const project = aliasRes.data;
+          setExistingProject(project);
+          if (importSource === 'abs') {
+            navigate(`/bot/${project.id}`);
+          } else {
+            // ask user if they want to save to existing, or save as a new project
+            setModalState('promptingToSave');
+          }
+          return;
+        }
+      }
+      importAsNewProject(projectInfo);
     }
   }, [importPayload, importSource]);
 

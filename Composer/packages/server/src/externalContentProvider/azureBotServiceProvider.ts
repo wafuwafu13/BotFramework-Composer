@@ -7,8 +7,6 @@ import { createWriteStream } from 'fs';
 import fetch, { RequestInit } from 'node-fetch';
 import { remove, ensureDirSync } from 'fs-extra';
 import AdmZip from 'adm-zip';
-// import { DefaultAzureCredential } from '@azure/identity';
-// import { SecretClient } from '@azure/keyvault-secrets';
 
 import { authService } from '../services/auth/auth';
 
@@ -31,8 +29,8 @@ export type AzureBotServiceMetadata = IContentProviderMetadata & {
   botName?: string;
   /** Azure App Id */
   appId: string;
-  /** Azure App password */
-  appPassword: string;
+  /** keyvault id for Azure App password */
+  appPasswordHint: string;
   /** Azure Subscription Id */
   subscriptionId: string;
   /** Azure resource group name */
@@ -58,16 +56,6 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
       method: 'GET',
       headers: await this.getRequestHeaders(),
     };
-
-    // get key vault
-    // const keyvaultName = 'composertest';
-    // const keyvaultUrl = `https://${keyvaultName}.vault.azure.net`;
-    // const credential = new DefaultAzureCredential();
-    // const client = new SecretClient(keyvaultUrl, credential);
-
-    // const secretName = 'MicrosoftAppPassword';
-    // const secrets = await client.getSecret(secretName);
-    // console.log(secrets.value);
 
     // download
     if (!this.metadata.tags || !this.metadata.tags.webapp) {
@@ -141,7 +129,8 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
 
   public async getAlias() {
     // To load correct project, alias should be project name as the project's URI.
-    return `abs-${this.botName}`;
+    console.log(this.botName);
+    return `abs-${this.metadata.botName}-${this.metadata.appId}`;
   }
   public async authenticate() {
     return await this.getAccessToken();
@@ -154,7 +143,7 @@ export class AzureBotServiceProvider extends ExternalContentProvider<AzureBotSer
         runtimeIdentifier: 'win-x64',
         settings: {
           MicrosoftAppId: this.metadata.appId,
-          MicrosoftAppPassword: this.metadata.appPassword,
+          MicrosoftAppPassword: this.metadata.appPassword || '',
         },
         abs: this.metadata,
       };
