@@ -18714,13 +18714,8 @@ set-blocking@^2.0.0, set-blocking@~2.0.0:
 
 set-value@^0.4.3, set-value@^2.0.0, set-value@^3.0.2:
   version "3.0.2"
-<<<<<<< Updated upstream
-  resolved "https://registry.yarnpkg.com/set-value/-/set-value-3.0.2.tgz#74e8ecd023c33d0f77199d415409a40f21e61b90"
-  integrity sha512-npjkVoz+ank0zjlV9F47Fdbjfj/PfXyVhZvGALWsyIYU/qrMzpi6avjKW3/7KeSU2Df3I46BrN1xOI1+6vW0hA==
-=======
   resolved "https://botbuilder.myget.org/F/botframework-cli/npm/set-value/-/set-value-3.0.2.tgz#74e8ecd023c33d0f77199d415409a40f21e61b90"
   integrity sha1-dOjs0CPDPQ93GZ1BVAmkDyHmG5A=
->>>>>>> Stashed changes
   dependencies:
     is-plain-object "^2.0.4"
 
@@ -19828,13 +19823,8 @@ terminal-link@^2.0.0:
 
 terser-webpack-plugin@2.3.7, terser-webpack-plugin@^1.4.3, terser-webpack-plugin@^2.3.7:
   version "2.3.8"
-<<<<<<< Updated upstream
-  resolved "https://registry.yarnpkg.com/terser-webpack-plugin/-/terser-webpack-plugin-2.3.8.tgz#894764a19b0743f2f704e7c2a848c5283a696724"
-  integrity sha512-/fKw3R+hWyHfYx7Bv6oPqmk4HGQcrWLtV3X6ggvPuwPNHSnzvVV51z6OaaCOus4YLjutYGOz3pEpbhe6Up2s1w==
-=======
   resolved "https://botbuilder.myget.org/F/botframework-cli/npm/terser-webpack-plugin/-/terser-webpack-plugin-2.3.8.tgz#894764a19b0743f2f704e7c2a848c5283a696724"
   integrity sha1-iUdkoZsHQ/L3BOfCqEjFKDppZyQ=
->>>>>>> Stashed changes
   dependencies:
     cacache "^13.0.1"
     find-cache-dir "^3.3.1"
