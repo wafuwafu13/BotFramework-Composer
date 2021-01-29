@@ -3,8 +3,7 @@
 
 import { buildInFunctionsMap, getBuiltInFunctionInsertText } from '@bfc/built-in-functions';
 import styled from '@emotion/styled';
-import { NeutralColors } from '@uifabric/fluent-theme';
-import { DefaultPalette } from '@uifabric/styling';
+import { NeutralColors, FluentTheme } from '@uifabric/fluent-theme';
 import formatMessage from 'format-message';
 import { IconButton, IButton } from 'office-ui-fabric-react/lib/Button';
 import { createSvgIcon } from '@fluentui/react-icons';
@@ -49,10 +48,10 @@ const templateSvgIcon = (
   </svg>
 );
 
-const DEFAULT_TREE_ITEM_HEIGHT = 36;
+const defaultTreeItemHeight = 36;
 
 const labelContainerStyle: IStackStyles = {
-  root: { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', height: DEFAULT_TREE_ITEM_HEIGHT },
+  root: { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', height: defaultTreeItemHeight },
 };
 
 const headerContainerStyles = {
@@ -61,8 +60,8 @@ const headerContainerStyles = {
 
 const Header = styled(Label)({
   padding: '0 8px',
-  color: DefaultPalette.accent,
-  fontSize: 12,
+  color: FluentTheme.palette.accent,
+  fontSize: FluentTheme.fonts.small.fontSize,
 });
 
 const OneLiner = styled.div({

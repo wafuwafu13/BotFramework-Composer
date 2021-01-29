@@ -13,7 +13,7 @@ import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
 import { Link } from 'office-ui-fabric-react/lib/Link';
 import React, { useEffect, useState } from 'react';
 import { listen, MessageConnection } from 'vscode-ws-jsonrpc';
-import { NeutralColors } from '@uifabric/fluent-theme';
+import { FluentTheme, NeutralColors } from '@uifabric/fluent-theme';
 
 import { BaseEditor, BaseEditorProps, OnInit } from '../BaseEditor';
 import { LG_HELP } from '../constants';
@@ -31,11 +31,15 @@ const placeholder = formatMessage(
 );
 
 const linkStyles = {
-  root: { fontSize: 12, ':hover': { textDecoration: 'none' }, ':active': { textDecoration: 'none' } },
+  root: {
+    fontSize: FluentTheme.fonts.small.fontSize,
+    ':hover': { textDecoration: 'none' },
+    ':active': { textDecoration: 'none' },
+  },
 };
 
-const fontSize12Style = { root: { fontSize: 12 } };
-const grayTextStyle = { root: { color: NeutralColors.gray80, fontSize: 12 } };
+const fontSize12Style = { root: { fontSize: FluentTheme.fonts.small.fontSize } };
+const grayTextStyle = { root: { color: NeutralColors.gray80, fontSize: FluentTheme.fonts.small.fontSize } };
 
 export interface LgCodeEditorProps extends BaseEditorProps {
   lgTemplates?: readonly LgTemplate[];
