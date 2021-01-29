@@ -5,8 +5,8 @@ import { LgTemplate } from '@botframework-composer/types';
 import { NeutralColors, FluentTheme } from '@uifabric/fluent-theme';
 import formatMessage from 'format-message';
 import { CommandBar, ICommandBarItemProps } from 'office-ui-fabric-react/lib/CommandBar';
+import { VerticalDivider } from 'office-ui-fabric-react/lib/Divider';
 import * as React from 'react';
-import styled from '@emotion/styled';
 
 import { withTooltip } from '../utils/withTooltip';
 
@@ -15,12 +15,11 @@ import { useLgEditorToolbarItems } from './useLgEditorToolbarItems';
 
 const menuHeight = 32;
 
-const Separator = styled.div({
-  height: menuHeight - 12,
-  width: 1,
-  margin: '6px 2px',
-  background: NeutralColors.gray80,
-});
+const dividerStyles = {
+  divider: {
+    height: 'calc(100% - 12px)',
+  },
+};
 
 const moreButtonStyles = {
   root: {
@@ -106,7 +105,9 @@ export const LgEditorToolbar = React.memo((props: LgEditorToolbarProps) => {
   const items = React.useMemo(
     () => [
       ...fixedItems,
-      ...(moreItems.length ? [{ key: 'divider', commandBarButtonAs: () => <Separator /> }] : []),
+      ...(moreItems.length
+        ? [{ key: 'divider', commandBarButtonAs: () => <VerticalDivider styles={dividerStyles} /> }]
+        : []),
       ...moreItems,
     ],
     [fixedItems, moreItems]
