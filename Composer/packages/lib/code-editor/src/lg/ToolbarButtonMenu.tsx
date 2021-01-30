@@ -50,6 +50,7 @@ const templateSvgIcon = (
 
 const defaultTreeItemHeight = 36;
 
+const buttonStyles = { menuIcon: { fontSize: 8, color: NeutralColors.black } };
 const labelContainerStyle: IStackStyles = {
   root: { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', height: defaultTreeItemHeight },
 };
@@ -439,8 +440,8 @@ export const ToolbarButtonMenu = React.memo((props: ToolbarButtonMenuProps) => {
       componentRef={buttonRef}
       disabled={disabled}
       menuProps={menuProps}
+      styles={buttonStyles}
       onRenderIcon={renderIcon}
-      onRenderMenuIcon={() => null}
     />
   );
 });
