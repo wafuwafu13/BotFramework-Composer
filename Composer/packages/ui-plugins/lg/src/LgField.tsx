@@ -126,6 +126,26 @@ const LgField: React.FC<FieldProps<string>> = (props) => {
     [shellApi, projectId]
   );
 
+  const updateModalityLgTemplate = React.useCallback(
+    async (modality: string, body: string) => {
+      await shellApi.debouncedUpdateLgTemplate(lgFileId, `${lgName}_${modality}`, body);
+    },
+    [lgName, lgFileId]
+  );
+
+  const handleModalityChange = React.useCallback(
+    (modality: string, body: string) => {
+      if (designerId) {
+        if (body) {
+          updateModalityLgTemplate(modality, body);
+        } else {
+          shellApi.removeLgTemplate(lgFileId, `${lgName}_${modality}`);
+        }
+      }
+    },
+    [designerId, lgFileId, lgName]
+  );
+
   return (
     <React.Fragment>
       <Stack horizontal horizontalAlign="space-between" verticalAlign="center">
@@ -156,6 +176,7 @@ const LgField: React.FC<FieldProps<string>> = (props) => {
         value={template.body}
         onChange={onChange}
         onChangeSettings={handleSettingsChange}
+        onModalityChange={handleModalityChange}
         onNavigateToLgPage={navigateToLgPage}
       />
     </React.Fragment>

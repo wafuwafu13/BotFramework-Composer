@@ -14,5 +14,5 @@ export type LgEditorProps = LgCodeEditorProps & {
 
 export const LgEditor = (props: LgEditorProps) => {
   const { mode, ...editorProps } = props;
-  return mode === 'codeEditor' ? <LgCodeEditor {...editorProps} /> : <LgResponseEditor />;
+  return mode === 'codeEditor' ? <LgCodeEditor {...editorProps} /> : <LgResponseEditor {...editorProps} />;
 };

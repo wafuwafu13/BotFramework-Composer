@@ -8,7 +8,7 @@ import { ModalityEditorContainer } from './ModalityEditorContainer';
 import { ModalityEditorProps } from './types';
 import { StringArrayEditor } from './StringArrayEditor';
 
-const TextModalityEditor = React.memo(
+const SpeechModalityEditor = React.memo(
   ({ disableRemoveModality, template, title, onModalityChange, onRemoveModality }: ModalityEditorProps) => {
     const [items, setItems] = useState<string[]>(template?.body?.replaceAll('- ', '').split('\n') || []);
 
@@ -23,7 +23,7 @@ const TextModalityEditor = React.memo(
     return (
       <ModalityEditorContainer
         disableRemoveModality={disableRemoveModality}
-        modality={formatMessage('Text')}
+        modality={formatMessage('Speech')}
         title={title}
         onRemoveModality={onRemoveModality}
       >
@@ -33,4 +33,4 @@ const TextModalityEditor = React.memo(
   }
 );
 
-export { TextModalityEditor };
+export { SpeechModalityEditor };

@@ -53,6 +53,7 @@ export interface LgCodeEditorProps extends BaseEditorProps {
         path: string;
       }
     | string;
+  onModalityChange?: (modality: string, body: string) => void;
 }
 
 const defaultLGServer = {

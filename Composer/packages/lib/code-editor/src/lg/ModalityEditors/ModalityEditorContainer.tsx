@@ -60,6 +60,7 @@ const onRenderOverflowButton = (overflowItems?: IContextualMenuItem[]): JSX.Elem
 
 type Props = {
   description?: string;
+  disableRemoveModality: boolean;
   title: string;
   menuItems?: IContextualMenuItem[];
   modality: string;
@@ -69,6 +70,7 @@ type Props = {
 const ModalityEditorContainer: React.FC<Props> = ({
   children,
   description,
+  disableRemoveModality,
   menuItems = [],
   modality,
   title,
@@ -79,6 +81,7 @@ const ModalityEditorContainer: React.FC<Props> = ({
       ...menuItems,
       {
         key: 'remove',
+        disabled: disableRemoveModality,
         text: formatMessage('Remove {modality} modality', { modality: modality?.toLowerCase() }),
         onClick: () => onRemoveModality(),
       },

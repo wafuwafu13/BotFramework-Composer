@@ -176,6 +176,9 @@
   "add_new_validation_rule_here_eb675ccf": {
     "message": "Add new validation rule here"
   },
+  "add_new_variation_e49425ea": {
+    "message": "Add new variation"
+  },
   "add_property_d381eba3": {
     "message": "Add Property"
   },
@@ -286,6 +289,9 @@
   },
   "attachment_input_e0ece49c": {
     "message": "Attachment Input"
+  },
+  "attachments_694cf227": {
+    "message": "Attachments"
   },
   "australiaeast_f3227a31": {
     "message": "australiaeast"
@@ -1439,6 +1445,9 @@
   "insert_property_reference_38f0605": {
     "message": "Insert property reference"
   },
+  "insert_ssml_tag_1fedbe80": {
+    "message": "Insert SSML tag"
+  },
   "insert_template_reference_bb33720e": {
     "message": "Insert template reference"
   },
@@ -2054,6 +2063,9 @@
   "optional_setting_a_minimum_value_enables_your_bot__f1fd4bce": {
     "message": "Optional. Setting a minimum value enables your bot to reject a value that is too small and re-prompt the user for a new value."
   },
+  "options_3ab0ea65": {
+    "message": "Options"
+  },
   "or_4f7d4edb": {
     "message": "Or: "
   },
@@ -2369,6 +2381,9 @@
   "remove_f47dc62a": {
     "message": "Remove"
   },
+  "remove_modality_modality_5310ea59": {
+    "message": "Remove { modality } modality"
+  },
   "remove_this_dialog_6146716c": {
     "message": "Remove this dialog"
   },
@@ -2407,6 +2422,9 @@
   },
   "response_is_response_3cd62f8f": {
     "message": "Response is { response }"
+  },
+  "response_variations_302594e": {
+    "message": "Response Variations"
   },
   "responses_12d6df1d": {
     "message": "Responses"
@@ -2672,6 +2690,12 @@
   "specify_a_name_description_and_location_for_your_n_667f1438": {
     "message": "Specify a name, description, and location for your new bot project."
   },
+  "speech_16063aed": {
+    "message": "Speech"
+  },
+  "ssml_tag_981a8aac": {
+    "message": "SSML tag"
+  },
   "start_and_stop_local_bot_runtimes_individually_901c8d7d": {
     "message": "Start and stop local bot runtimes individually."
   },
@@ -2728,6 +2752,9 @@
   },
   "submit_a3cc6859": {
     "message": "Submit"
+  },
+  "suggested_actions_94d06bfa": {
+    "message": "Suggested Actions"
   },
   "switch_to_code_editor_3dcbe16f": {
     "message": "switch to code editor"
@@ -2884,6 +2911,9 @@
   },
   "to_customize_the_welcome_message_select_the_i_send_9b4bf4f": {
     "message": "To customize the welcome message, select the <i>Send a response</i> action in the Visual Editor. Then in the Form Editor on the right, you can edit the bot''s welcome message in the <b>Language Generation</b> field."
+  },
+  "to_learn_more_about_ssml_tags_a_go_to_this_documen_7df7b3ac": {
+    "message": "To learn more about SSML Tags, <a>go to this document</a>."
   },
   "to_learn_more_about_the_lg_file_format_read_the_do_ef6e083d": {
     "message": "> To learn more about the LG file format, read the documentation at\n> { lgHelp }"

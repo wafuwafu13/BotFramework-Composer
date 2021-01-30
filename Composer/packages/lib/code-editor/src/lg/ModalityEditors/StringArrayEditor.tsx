@@ -1,13 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import React, { useCallback } from 'react';
+import React, { useEffect, useCallback, useRef, useState } from 'react';
 import styled from '@emotion/styled';
-import { Link } from 'office-ui-fabric-react/lib/Link';
+import { Link, ILinkStyles } from 'office-ui-fabric-react/lib/Link';
 import { NeutralColors } from '@uifabric/fluent-theme/lib/fluent/FluentColors';
-import { TextField } from 'office-ui-fabric-react/lib/TextField';
+import { TextField, ITextField, ITextFieldStyles } from 'office-ui-fabric-react/lib/TextField';
 import formatMessage from 'format-message';
-import set from 'lodash/set';
 
 const Item = styled(TextField)({
   borderBottom: `1px solid ${NeutralColors.gray30}`,
@@ -15,7 +14,7 @@ const Item = styled(TextField)({
   width: '100%',
 });
 
-const styles = {
+const styles: { link: ILinkStyles; textInput: Partial<ITextFieldStyles> } = {
   link: { root: { fontSize: 12, ':hover': { textDecoration: 'none' }, ':active': { textDecoration: 'none' } } },
   textInput: {
     fieldGroup: {
@@ -30,35 +29,69 @@ const styles = {
   },
 };
 
-type Props = {
+type ArrayItemProps = {
+  value: string;
+  onBlur: () => void;
+  onChange: (event, value?: string) => void;
+};
+
+const ArrayItem = React.memo(({ value, onBlur, onChange }: ArrayItemProps) => {
+  const itemRef = useRef<ITextField | null>(null);
+
+  useEffect(() => {
+    if (!value) {
+      itemRef.current?.focus();
+    }
+  }, []);
+
+  return (
+    <Item
+      componentRef={(ref) => (itemRef.current = ref)}
+      styles={styles.textInput}
+      value={value}
+      onBlur={onBlur}
+      onChange={onChange}
+    />
+  );
+});
+
+type StringArrayEditorProps = {
   items: string[];
   onChange: (items: string[]) => void;
 };
 
-const StringArrayEditor = React.memo(({ items, onChange }: Props) => {
+const StringArrayEditor = React.memo(({ items, onChange }: StringArrayEditorProps) => {
+  const [visible, setVisible] = useState(true);
+
   const handleChange = useCallback(
     (index: number) => (_, newValue?: string) => {
-      onChange(set(items, index, newValue));
+      const updatedItems = [...items];
+      updatedItems[index] = newValue ?? '';
+      onChange(updatedItems);
     },
     [items, onChange]
   );
 
   const handleBlur = useCallback(() => {
     onChange(items.filter(Boolean));
+    setVisible(true);
   }, [items, onChange]);
 
   const handleClickAddVariation = useCallback(() => {
     onChange([...items, '']);
+    setVisible(false);
   }, [items, onChange]);
 
   return (
     <React.Fragment>
       {items.map((value, key) => (
-        <Item key={key} styles={styles.textInput} value={value} onBlur={handleBlur} onChange={handleChange(key)} />
+        <ArrayItem key={key} value={value} onBlur={handleBlur} onChange={handleChange(key)} />
       ))}
-      <Link as="button" styles={styles.link} onClick={handleClickAddVariation}>
-        {formatMessage('Add new variation')}
-      </Link>
+      {visible && (
+        <Link as="button" styles={styles.link} onClick={handleClickAddVariation}>
+          {formatMessage('Add new variation')}
+        </Link>
+      )}
     </React.Fragment>
   );
 });

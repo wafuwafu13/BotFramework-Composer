@@ -7,14 +7,17 @@ import formatMessage from 'format-message';
 import { ModalityEditorContainer } from './ModalityEditorContainer';
 import { ModalityEditorProps } from './types';
 
-const SuggestedActionsModalityEditor = React.memo(({ title, onRemoveModality }: ModalityEditorProps) => {
-  return (
-    <ModalityEditorContainer
-      modality={formatMessage('Suggested Actions')}
-      title={title}
-      onRemoveModality={onRemoveModality}
-    />
-  );
-});
+const SuggestedActionsModalityEditor = React.memo(
+  ({ disableRemoveModality, title, onRemoveModality }: ModalityEditorProps) => {
+    return (
+      <ModalityEditorContainer
+        disableRemoveModality={disableRemoveModality}
+        modality={formatMessage('Suggested Actions')}
+        title={title}
+        onRemoveModality={onRemoveModality}
+      />
+    );
+  }
+);
 
 export { SuggestedActionsModalityEditor };
