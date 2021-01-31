@@ -15,8 +15,8 @@ type Props = {
 
 export const ModalityEditorTitle = React.memo(({ title, modalityType, helpMessage }: Props) => (
   <ItemWithTooltip
-    helpMessage={helpMessage}
     itemText={<Label>{title}</Label>}
     tooltipId={`${modalityType}ModalityTitle`}
+    tooltipText={helpMessage}
   />
 ));

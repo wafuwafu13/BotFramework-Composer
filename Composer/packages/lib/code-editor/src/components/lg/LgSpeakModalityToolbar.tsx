@@ -9,14 +9,11 @@ import {
   IContextualMenuItemRenderFunctions,
 } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Link } from 'office-ui-fabric-react/lib/Link';
-import { Stack } from 'office-ui-fabric-react/lib/Stack';
 import * as React from 'react';
 
-import { HelpIconTooltip } from '../HelpIconTooltip';
+import { ItemWithTooltip } from '../ItemWithTooltip';
 
 import { LgEditorToolbar, LgEditorToolbarProps } from './LgEditorToolbar';
-
-const headerContainerTokens = { childrenGap: 4 };
 
 const menuItemStyles = {
   fontSize: FluentTheme.fonts.small.fontSize,
@@ -34,19 +31,17 @@ export const LgSpeakModalityToolbar = React.memo((props: Props) => {
 
   const renderHeaderContent = React.useCallback(
     (itemProps: IContextualMenuItemProps, defaultRenders: IContextualMenuItemRenderFunctions) => (
-      <Stack horizontal tokens={headerContainerTokens} verticalAlign="center">
-        {defaultRenders.renderItemName(itemProps)}
-        <HelpIconTooltip
-          helpMessage={formatMessage.rich('To learn more about SSML Tags, <a>go to this document</a>.', {
-            a: ({ children }) => (
-              <Link href="#" target="_blank">
-                {children}
-              </Link>
-            ),
-          })}
-          tooltipId={id}
-        />
-      </Stack>
+      <ItemWithTooltip
+        itemText={defaultRenders.renderItemName(itemProps)}
+        tooltipId={id}
+        tooltipText={formatMessage.rich('To learn more about SSML Tags, <a>go to this document</a>.', {
+          a: ({ children }) => (
+            <Link href="#" target="_blank">
+              {children}
+            </Link>
+          ),
+        })}
+      />
     ),
     [id]
   );
@@ -68,10 +63,9 @@ export const LgSpeakModalityToolbar = React.memo((props: Props) => {
     [renderHeaderContent, onInsertSSMLTag]
   );
 
-  return (
-    <LgEditorToolbar
-      {...restProps}
-      moreToolbarItems={[{ key: 'ssmlTag', text: formatMessage('SSML tag'), subMenuProps }]}
-    />
-  );
+  const moreToolbarItems = React.useMemo(() => [{ key: 'ssmlTag', text: formatMessage('SSML tag'), subMenuProps }], [
+    subMenuProps,
+  ]);
+
+  return <LgEditorToolbar {...restProps} moreToolbarItems={moreToolbarItems} />;
 });

@@ -170,9 +170,9 @@ const ModalityPivot = React.memo(({ lgOption, lgTemplates, onModalityChange = ()
   const renderPivotAddMenu = React.useCallback((itemProps: IContextualMenuItemProps) => {
     return (
       <ItemWithTooltip
-        helpMessage={getModalityTooltipText(itemProps.item.key as ModalityType)}
         itemText={itemProps.item.text ?? ''}
         tooltipId={itemProps.item.key}
+        tooltipText={getModalityTooltipText(itemProps.item.key as ModalityType)}
       />
     );
   }, []);

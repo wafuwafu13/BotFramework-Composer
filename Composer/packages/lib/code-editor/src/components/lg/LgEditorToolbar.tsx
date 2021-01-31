@@ -26,6 +26,7 @@ const moreButtonStyles = {
     fontSize: FluentTheme.fonts.small.fontSize,
     height: menuHeight,
   },
+  menuIcon: { fontSize: 8, color: NeutralColors.black },
 };
 
 const commandBarStyles = {

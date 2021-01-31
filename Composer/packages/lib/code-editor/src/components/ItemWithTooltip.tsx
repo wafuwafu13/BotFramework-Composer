@@ -11,13 +11,13 @@ const containerTokens = { childrenGap: 4 };
 
 type Props = {
   tooltipId: string;
-  itemText: string | JSX.Element | JSX.Element[];
-  helpMessage: string | JSX.Element | JSX.Element[];
+  itemText: string | JSX.Element | JSX.Element[] | React.ReactNode;
+  tooltipText: string | JSX.Element | JSX.Element[];
 };
 
 const defaultRender = (text: string) => <Text variant="small">{text}</Text>;
 
-export const ItemWithTooltip = React.memo(({ tooltipId, itemText, helpMessage }: Props) => (
+export const ItemWithTooltip = React.memo(({ tooltipId, itemText, tooltipText: helpMessage }: Props) => (
   <Stack horizontal tokens={containerTokens} verticalAlign="center">
     {typeof itemText === 'string' ? defaultRender(itemText) : itemText}
     <HelpIconTooltip helpMessage={helpMessage} tooltipId={tooltipId} />
