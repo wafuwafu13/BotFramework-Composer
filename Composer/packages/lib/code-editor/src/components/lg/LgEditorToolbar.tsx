@@ -8,10 +8,10 @@ import { CommandBar, ICommandBarItemProps } from 'office-ui-fabric-react/lib/Com
 import { VerticalDivider } from 'office-ui-fabric-react/lib/Divider';
 import * as React from 'react';
 
-import { withTooltip } from '../utils/withTooltip';
+import { withTooltip } from '../../utils/withTooltip';
 
+import { useLgEditorToolbarItems } from './hooks/useLgEditorToolbarItems';
 import { ToolbarButtonMenu } from './ToolbarButtonMenu';
-import { useLgEditorToolbarItems } from './useLgEditorToolbarItems';
 
 const menuHeight = 32;
 

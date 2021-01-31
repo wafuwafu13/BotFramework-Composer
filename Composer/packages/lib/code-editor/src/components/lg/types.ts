@@ -36,3 +36,6 @@ export type LgLanguageContext =
   | 'templateBody'
   | 'templateName'
   | 'root';
+
+export const modalityTypes = ['text', 'speak', 'attachments', 'suggestedActions'] as const;
+export type ModalityType = typeof modalityTypes[number];

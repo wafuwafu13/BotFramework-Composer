@@ -1,24 +1,38 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import React, { useCallback, useMemo, useState } from 'react';
-import { FontSizes } from '@uifabric/fluent-theme';
-import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
-import { IconButton } from 'office-ui-fabric-react/lib/Button';
 import { LgTemplate } from '@bfc/shared';
-import { Pivot, PivotItem, IPivotStyles } from 'office-ui-fabric-react/lib/Pivot';
-import { Stack } from 'office-ui-fabric-react/lib/Stack';
+import { FontSizes } from '@uifabric/fluent-theme';
 import formatMessage from 'format-message';
+import { IconButton } from 'office-ui-fabric-react/lib/Button';
+import { IContextualMenuItem, IContextualMenuItemProps } from 'office-ui-fabric-react/lib/ContextualMenu';
+import { IPivotStyles, Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
+import { Stack } from 'office-ui-fabric-react/lib/Stack';
+import React, { useCallback, useMemo, useState } from 'react';
 
-import { AttachmentModalityEditor } from './ModalityEditors/AttachmentModalityEditor';
+import { ItemWithTooltip } from '../ItemWithTooltip';
+
 import { LgCodeEditorProps } from './LgCodeEditor';
-import { SpeechModalityEditor } from './ModalityEditors/SpeechModalityEditor';
-import { SuggestedActionsModalityEditor } from './ModalityEditors/SuggestedActionsModalityEditor';
-import { TextModalityEditor } from './ModalityEditors/TextModalityEditor';
+import { AttachmentModalityEditor } from './modalityEditors/AttachmentModalityEditor';
+import { SpeechModalityEditor } from './modalityEditors/SpeechModalityEditor';
+import { SuggestedActionsModalityEditor } from './modalityEditors/SuggestedActionsModalityEditor';
+import { TextModalityEditor } from './modalityEditors/TextModalityEditor';
+import { ModalityType, modalityTypes } from './types';
 
-const modalityTypes = ['text', 'speak', 'attachments', 'suggestedActions'] as const;
+const getModalityTooltipText = (modality: ModalityType) => {
+  switch (modality) {
+    case 'attachments':
+      return formatMessage('Attachment tooltip');
+    case 'speak':
+      return formatMessage('Speak tooltip');
+    case 'suggestedActions':
+      return formatMessage('Suggested actions tooltip');
+    case 'text':
+      return formatMessage('Text tooltip');
+  }
+};
 
-type ModalityTypes = typeof modalityTypes[number];
+const addButtonIconProps = { iconName: 'Add', styles: { root: { fontSize: FontSizes.size14 } } };
 
 const styles: { tabs: Partial<IPivotStyles> } = {
   tabs: {
@@ -32,20 +46,17 @@ const styles: { tabs: Partial<IPivotStyles> } = {
 };
 
 const renderModalityEditor = (
-  modality: ModalityTypes,
-  onRemoveModality: (modality: ModalityTypes) => () => void,
-  onModalityChange: (modality: ModalityTypes, body: string) => void,
-  modalityTemplates: Record<ModalityTypes, LgTemplate>,
+  modality: ModalityType,
+  onRemoveModality: (modality: ModalityType) => () => void,
+  onModalityChange: (modality: ModalityType, body: string) => void,
+  modalityTemplates: Record<ModalityType, LgTemplate>,
   disableRemoveModality: boolean
 ) => {
-  const title = formatMessage('Response Variations');
-
   switch (modality) {
     case 'attachments':
       return (
         <AttachmentModalityEditor
-          disableRemoveModality={disableRemoveModality}
-          title={title}
+          removeModalityDisabled={disableRemoveModality}
           onModalityChange={(body: string) => onModalityChange('attachments', body)}
           onRemoveModality={onRemoveModality('attachments')}
         />
@@ -53,9 +64,8 @@ const renderModalityEditor = (
     case 'speak':
       return (
         <SpeechModalityEditor
-          disableRemoveModality={disableRemoveModality}
-          template={modalityTemplates['speak']}
-          title={title}
+          removeModalityDisabled={disableRemoveModality}
+          template={modalityTemplates.speak}
           onModalityChange={(body: string) => onModalityChange('speak', body)}
           onRemoveModality={onRemoveModality('speak')}
         />
@@ -63,8 +73,7 @@ const renderModalityEditor = (
     case 'suggestedActions':
       return (
         <SuggestedActionsModalityEditor
-          disableRemoveModality={disableRemoveModality}
-          title={title}
+          removeModalityDisabled={disableRemoveModality}
           onModalityChange={(body: string) => onModalityChange('suggestedActions', body)}
           onRemoveModality={onRemoveModality('suggestedActions')}
         />
@@ -72,9 +81,8 @@ const renderModalityEditor = (
     case 'text':
       return (
         <TextModalityEditor
-          disableRemoveModality={disableRemoveModality}
-          template={modalityTemplates['text']}
-          title={title}
+          removeModalityDisabled={disableRemoveModality}
+          template={modalityTemplates.text}
           onModalityChange={(body: string) => onModalityChange('text', body)}
           onRemoveModality={onRemoveModality('text')}
         />
@@ -82,9 +90,9 @@ const renderModalityEditor = (
   }
 };
 
-const getInitialModalities = (modalityTemplates: Record<ModalityTypes, any>): ModalityTypes[] => {
+const getInitialModalities = (modalityTemplates: Record<ModalityType, LgTemplate>): ModalityType[] => {
   const modalities = Object.keys(modalityTemplates);
-  return modalities.length ? (modalities as ModalityTypes[]) : ['text'];
+  return modalities.length ? (modalities as ModalityType[]) : ['text'];
 };
 
 const ModalityPivot = React.memo(({ lgOption, lgTemplates, onModalityChange = () => {} }: LgCodeEditorProps) => {
@@ -93,12 +101,12 @@ const ModalityPivot = React.memo(({ lgOption, lgTemplates, onModalityChange = ()
       modalityTypes.reduce((acc, modality) => {
         const template = lgTemplates?.find(({ name }) => name === `${lgOption?.templateId}_${modality}`);
         return template ? { ...acc, [modality]: template } : acc;
-      }, {} as Record<ModalityTypes, LgTemplate>),
+      }, {} as Record<ModalityType, LgTemplate>),
     [lgTemplates, lgOption?.templateId]
   );
 
-  const [modalities, setModalities] = useState<ModalityTypes[]>(getInitialModalities(modalityTemplates));
-  const [selectedKey, setSelectedKey] = useState<ModalityTypes>(modalities[0]);
+  const [modalities, setModalities] = useState<ModalityType[]>(getInitialModalities(modalityTemplates));
+  const [selectedKey, setSelectedKey] = useState<ModalityType>(modalities[0]);
 
   const items = useMemo<IContextualMenuItem[]>(
     () => [
@@ -127,13 +135,13 @@ const ModalityPivot = React.memo(({ lgOption, lgTemplates, onModalityChange = ()
       modalities.map((modality) => items.find(({ key }) => key === modality)).filter(Boolean) as IContextualMenuItem[],
     [items, modalities]
   );
-  const menuItems = useMemo(() => items.filter(({ key }) => !modalities.includes(key as ModalityTypes)), [
+  const menuItems = useMemo(() => items.filter(({ key }) => !modalities.includes(key as ModalityType)), [
     items,
     modalities,
   ]);
 
   const handleRemoveModality = useCallback(
-    (modality: ModalityTypes) => () => {
+    (modality: ModalityType) => () => {
       if (modalities.length > 1) {
         const updatedModalities = modalities.filter((item) => item !== modality);
         setModalities(updatedModalities);
@@ -146,8 +154,8 @@ const ModalityPivot = React.memo(({ lgOption, lgTemplates, onModalityChange = ()
   const handleItemClick = useCallback(
     (_, item?: IContextualMenuItem) => {
       if (item?.key) {
-        setModalities((current) => [...current, item.key as ModalityTypes]);
-        setSelectedKey(item.key as ModalityTypes);
+        setModalities((current) => [...current, item.key as ModalityType]);
+        setSelectedKey(item.key as ModalityType);
       }
     },
     [setModalities]
@@ -155,9 +163,24 @@ const ModalityPivot = React.memo(({ lgOption, lgTemplates, onModalityChange = ()
 
   const handleLinkClicked = useCallback((item?: PivotItem) => {
     if (item?.props.itemKey) {
-      setSelectedKey(item?.props.itemKey as any);
+      setSelectedKey(item?.props.itemKey as ModalityType);
     }
   }, []);
+
+  const renderPivotAddMenu = React.useCallback((itemProps: IContextualMenuItemProps) => {
+    return (
+      <ItemWithTooltip
+        helpMessage={getModalityTooltipText(itemProps.item.key as ModalityType)}
+        itemText={itemProps.item.text ?? ''}
+        tooltipId={itemProps.item.key}
+      />
+    );
+  }, []);
+
+  const addMenuProps = React.useMemo(
+    () => ({ items: menuItems, onItemClick: handleItemClick, contextualMenuItemAs: renderPivotAddMenu }),
+    [menuItems, handleItemClick, renderPivotAddMenu]
+  );
 
   return (
     <Stack>
@@ -168,11 +191,7 @@ const ModalityPivot = React.memo(({ lgOption, lgTemplates, onModalityChange = ()
           ))}
         </Pivot>
         {menuItems.length && (
-          <IconButton
-            iconProps={{ iconName: 'Add', styles: { root: { fontSize: FontSizes.size14 } } }}
-            menuProps={{ items: menuItems, onItemClick: handleItemClick }}
-            onRenderMenuIcon={() => null}
-          />
+          <IconButton iconProps={addButtonIconProps} menuProps={addMenuProps} onRenderMenuIcon={() => null} />
         )}
       </Stack>
       {renderModalityEditor(

@@ -1,0 +1,25 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+import * as React from 'react';
+import { Text } from 'office-ui-fabric-react/lib/Text';
+import { Stack } from 'office-ui-fabric-react/lib/Stack';
+
+import { HelpIconTooltip } from './HelpIconTooltip';
+
+const containerTokens = { childrenGap: 4 };
+
+type Props = {
+  tooltipId: string;
+  itemText: string | JSX.Element | JSX.Element[];
+  helpMessage: string | JSX.Element | JSX.Element[];
+};
+
+const defaultRender = (text: string) => <Text variant="small">{text}</Text>;
+
+export const ItemWithTooltip = React.memo(({ tooltipId, itemText, helpMessage }: Props) => (
+  <Stack horizontal tokens={containerTokens} verticalAlign="center">
+    {typeof itemText === 'string' ? defaultRender(itemText) : itemText}
+    <HelpIconTooltip helpMessage={helpMessage} tooltipId={tooltipId} />
+  </Stack>
+));

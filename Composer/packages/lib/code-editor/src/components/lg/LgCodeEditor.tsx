@@ -15,14 +15,14 @@ import React, { useEffect, useState } from 'react';
 import { listen, MessageConnection } from 'vscode-ws-jsonrpc';
 import { FluentTheme, NeutralColors } from '@uifabric/fluent-theme';
 
-import { BaseEditor, BaseEditorProps, OnInit } from '../BaseEditor';
-import { LG_HELP } from '../constants';
-import { registerLGLanguage } from '../languages';
-import { LGOption } from '../utils';
-import { createLanguageClient, createUrl, createWebSocket, sendRequestWithRetry } from '../utils/lspUtil';
+import { BaseEditor, BaseEditorProps, OnInit } from '../../BaseEditor';
+import { LG_HELP } from '../../constants';
+import { registerLGLanguage } from '../../languages';
+import { LGOption } from '../../utils';
+import { createLanguageClient, createUrl, createWebSocket, sendRequestWithRetry } from '../../utils/lspUtil';
+import { computeRequiredEdits } from '../../utils/lgUtils';
 
 import { LgEditorToolbar } from './LgEditorToolbar';
-import { computeRequiredEdits } from './utils';
 
 const placeholder = formatMessage(
   `> To learn more about the LG file format, read the documentation at

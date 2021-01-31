@@ -1,16 +1,21 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import React, { useCallback, useState } from 'react';
 import formatMessage from 'format-message';
+import React, { useCallback, useState } from 'react';
 
 import { ModalityEditorContainer } from './ModalityEditorContainer';
-import { ModalityEditorProps } from './types';
 import { StringArrayEditor } from './StringArrayEditor';
+import { CommonModalityEditorProps } from './types';
 
 const SpeechModalityEditor = React.memo(
-  ({ disableRemoveModality, template, title, onModalityChange, onRemoveModality }: ModalityEditorProps) => {
-    const [items, setItems] = useState<string[]>(template?.body?.replaceAll('- ', '').split('\n') || []);
+  ({
+    removeModalityDisabled: disableRemoveModality,
+    template,
+    onModalityChange,
+    onRemoveModality,
+  }: CommonModalityEditorProps) => {
+    const [items, setItems] = useState<string[]>(template?.body?.replace(/- /g, '').split('\n') || []);
 
     const handleChange = useCallback(
       (newItems: string[]) => {
@@ -22,9 +27,11 @@ const SpeechModalityEditor = React.memo(
 
     return (
       <ModalityEditorContainer
+        contentDescription="speech help text"
+        contentTitle={formatMessage('Response Variations')}
         disableRemoveModality={disableRemoveModality}
-        modality={formatMessage('Speech')}
-        title={title}
+        modalityTitle={formatMessage('Suggested Actions')}
+        modalityType="suggestedActions"
         onRemoveModality={onRemoveModality}
       >
         <StringArrayEditor items={items} onChange={handleChange} />

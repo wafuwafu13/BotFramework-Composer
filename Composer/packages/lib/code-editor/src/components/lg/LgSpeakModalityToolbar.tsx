@@ -8,30 +8,15 @@ import {
   IContextualMenuItemProps,
   IContextualMenuItemRenderFunctions,
 } from 'office-ui-fabric-react/lib/ContextualMenu';
-import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import { Link } from 'office-ui-fabric-react/lib/Link';
 import { Stack } from 'office-ui-fabric-react/lib/Stack';
-import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
 import * as React from 'react';
+
+import { HelpIconTooltip } from '../HelpIconTooltip';
 
 import { LgEditorToolbar, LgEditorToolbarProps } from './LgEditorToolbar';
 
-const iconStyles = {
-  root: {
-    cursor: 'default',
-    lineHeight: '12px',
-  },
-};
-
 const headerContainerTokens = { childrenGap: 4 };
-
-const HelpTooltip = React.memo((props: { tooltipId: string; helpMessage: string | JSX.Element | JSX.Element[] }) => {
-  return (
-    <TooltipHost content={props.helpMessage} id={props.tooltipId}>
-      <Icon iconName={'Unknown'} styles={iconStyles} />
-    </TooltipHost>
-  );
-});
 
 const menuItemStyles = {
   fontSize: FluentTheme.fonts.small.fontSize,
@@ -51,7 +36,7 @@ export const LgSpeakModalityToolbar = React.memo((props: Props) => {
     (itemProps: IContextualMenuItemProps, defaultRenders: IContextualMenuItemRenderFunctions) => (
       <Stack horizontal tokens={headerContainerTokens} verticalAlign="center">
         {defaultRenders.renderItemName(itemProps)}
-        <HelpTooltip
+        <HelpIconTooltip
           helpMessage={formatMessage.rich('To learn more about SSML Tags, <a>go to this document</a>.', {
             a: ({ children }) => (
               <Link href="#" target="_blank">

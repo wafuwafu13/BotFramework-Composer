@@ -1,19 +1,18 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
-import { CommandBarButton } from 'office-ui-fabric-react/lib/Button';
-import { DirectionalHint, TooltipDelay } from 'office-ui-fabric-react/lib/Tooltip';
-import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
-import { Icon } from 'office-ui-fabric-react/lib/Icon';
-import { Label } from 'office-ui-fabric-react/lib/Label';
 import { NeutralColors } from '@uifabric/fluent-theme/lib/fluent/FluentColors';
+import formatMessage from 'format-message';
+import { CommandBarButton } from 'office-ui-fabric-react/lib/Button';
+import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { OverflowSet } from 'office-ui-fabric-react/lib/OverflowSet';
 import { Stack } from 'office-ui-fabric-react/lib/Stack';
-import formatMessage from 'format-message';
+import React, { useMemo } from 'react';
 
-import { withTooltip } from '../../utils/withTooltip';
+import { ModalityType } from '../types';
+
+import { ModalityEditorTitle } from './ModalityEditorTitle';
 
 const Root = styled.div({
   width: '100%',
@@ -24,27 +23,6 @@ const HeaderContainer = styled.div({
   padding: '8px 0 4px 4px',
   width: '100%',
 });
-
-const getInfoTooltip = (title: string, description?: string) =>
-  withTooltip(
-    {
-      delay: TooltipDelay.zero,
-      directionalHint: DirectionalHint.bottomAutoEdge,
-      styles: { root: { display: 'inline-block' } },
-      tooltipProps: {
-        styles: { root: { width: '288px', padding: '17px 28px' } },
-        onRenderContent: () => (
-          <div>
-            <h3 aria-label={title + '.'} style={{ fontSize: '20px', margin: '0', marginBottom: '10px' }}>
-              {title}
-            </h3>
-            <p>{description}</p>
-          </div>
-        ),
-      },
-    },
-    Icon
-  );
 
 const onRenderOverflowButton = (overflowItems?: IContextualMenuItem[]): JSX.Element => {
   return (
@@ -59,21 +37,23 @@ const onRenderOverflowButton = (overflowItems?: IContextualMenuItem[]): JSX.Elem
 };
 
 type Props = {
-  description?: string;
+  contentTitle: string;
+  contentDescription?: string;
   disableRemoveModality: boolean;
-  title: string;
   menuItems?: IContextualMenuItem[];
-  modality: string;
+  modalityTitle: string;
+  modalityType: ModalityType;
   onRemoveModality: () => void;
 };
 
 const ModalityEditorContainer: React.FC<Props> = ({
   children,
-  description,
+  modalityType,
+  contentDescription,
   disableRemoveModality,
   menuItems = [],
-  modality,
-  title,
+  modalityTitle,
+  contentTitle,
   onRemoveModality,
 }) => {
   const overflowMenuItems: IContextualMenuItem[] = useMemo(
@@ -82,34 +62,22 @@ const ModalityEditorContainer: React.FC<Props> = ({
       {
         key: 'remove',
         disabled: disableRemoveModality,
-        text: formatMessage('Remove {modality} modality', { modality: modality?.toLowerCase() }),
+        text: formatMessage('Remove {modality} modality', { modality: modalityTitle?.toLowerCase() }),
         onClick: () => onRemoveModality(),
       },
     ],
     [menuItems]
   );
 
-  const Tooltip = useMemo(() => getInfoTooltip(title, description), [title, description]);
-
   return (
     <Root>
       <HeaderContainer>
         <Stack horizontal horizontalAlign="space-between">
-          <Stack horizontal verticalAlign="center">
-            <Label>{title}</Label>
-            {description && (
-              <Tooltip
-                iconName={'Unknown'}
-                styles={{
-                  root: {
-                    color: NeutralColors.gray160,
-                    fontSize: '12px',
-                    paddingLeft: '4px',
-                  },
-                }}
-              />
-            )}
-          </Stack>
+          <ModalityEditorTitle
+            helpMessage={contentDescription ?? ''}
+            modalityType={modalityType}
+            title={contentTitle}
+          />
           <OverflowSet
             items={[]}
             overflowItems={overflowMenuItems}

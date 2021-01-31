@@ -1,19 +1,21 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import React from 'react';
 import formatMessage from 'format-message';
+import React from 'react';
 
 import { ModalityEditorContainer } from './ModalityEditorContainer';
-import { ModalityEditorProps } from './types';
+import { CommonModalityEditorProps } from './types';
 
 const SuggestedActionsModalityEditor = React.memo(
-  ({ disableRemoveModality, title, onRemoveModality }: ModalityEditorProps) => {
+  ({ removeModalityDisabled: disableRemoveModality, onRemoveModality }: CommonModalityEditorProps) => {
     return (
       <ModalityEditorContainer
+        contentDescription="suggested actions help text"
+        contentTitle={formatMessage('Response Variations')}
         disableRemoveModality={disableRemoveModality}
-        modality={formatMessage('Suggested Actions')}
-        title={title}
+        modalityTitle={formatMessage('Suggested Actions')}
+        modalityType="suggestedActions"
         onRemoveModality={onRemoveModality}
       />
     );

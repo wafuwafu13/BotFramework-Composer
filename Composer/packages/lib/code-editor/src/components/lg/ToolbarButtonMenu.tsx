@@ -23,6 +23,9 @@ import { DirectionalHint, TooltipHost } from 'office-ui-fabric-react/lib/Tooltip
 import { IRenderFunction } from 'office-ui-fabric-react/lib/Utilities';
 import * as React from 'react';
 
+import { computePropertyItemTree, getAllNodes } from '../../utils/lgUtils';
+
+import { useDebounce } from './hooks/useDebounce';
 import { PropertyTreeItem } from './PropertyTreeItem';
 import {
   ToolbarButtonPayload,
@@ -31,8 +34,6 @@ import {
   PropertyRefPayload,
   PropertyItem,
 } from './types';
-import { useDebounce } from './useDebounce';
-import { computePropertyItemTree, getAllNodes } from './utils';
 
 const propertiesSvgIcon = (
   <svg height="16" viewBox="0 0 2048 2048" width="16" xmlns="http://www.w3.org/2000/svg">

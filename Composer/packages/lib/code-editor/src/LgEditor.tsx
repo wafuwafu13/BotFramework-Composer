@@ -3,8 +3,8 @@
 
 import * as React from 'react';
 
-import { LgCodeEditor, LgCodeEditorProps } from './lg/LgCodeEditor';
-import { LgResponseEditor } from './lg/LgResponseEditor';
+import { LgCodeEditor, LgCodeEditorProps } from './components/lg/LgCodeEditor';
+import { LgResponseEditor } from './components/lg/LgResponseEditor';
 
 export type LgEditorMode = 'codeEditor' | 'responseEditor';
 

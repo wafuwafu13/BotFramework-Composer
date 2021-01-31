@@ -5,7 +5,7 @@ import { builtInFunctionsGrouping } from '@bfc/built-in-functions';
 import { LgTemplate } from '@bfc/shared';
 import * as React from 'react';
 
-import { FunctionRefPayload, PropertyRefPayload, TemplateRefPayload } from './types';
+import { FunctionRefPayload, PropertyRefPayload, TemplateRefPayload } from '../types';
 
 export const useLgEditorToolbarItems = (
   lgTemplates: readonly LgTemplate[],

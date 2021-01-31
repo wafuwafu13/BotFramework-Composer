@@ -3,7 +3,7 @@
 
 import uniq from 'lodash/uniq';
 
-import { LgLanguageContext, PropertyItem } from './types';
+import { LgLanguageContext, PropertyItem } from '../components/lg/types';
 
 const templateStart = '- ';
 const templateStartRegex = /\s*-\s*.*$/;
