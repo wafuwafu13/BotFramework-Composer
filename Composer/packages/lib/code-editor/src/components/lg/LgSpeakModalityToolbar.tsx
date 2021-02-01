@@ -22,18 +22,17 @@ const menuItemStyles = {
 export type SSMLTagType = 'break' | 'prosody' | 'audio';
 
 type Props = Omit<LgEditorToolbarProps, 'moreMenuItems'> & {
-  id: string;
   onInsertSSMLTag: (tagType: SSMLTagType) => void;
 };
 
 export const LgSpeakModalityToolbar = React.memo((props: Props) => {
-  const { id, onInsertSSMLTag, ...restProps } = props;
+  const { onInsertSSMLTag, ...restProps } = props;
 
   const renderHeaderContent = React.useCallback(
     (itemProps: IContextualMenuItemProps, defaultRenders: IContextualMenuItemRenderFunctions) => (
       <ItemWithTooltip
         itemText={defaultRenders.renderItemName(itemProps)}
-        tooltipId={id}
+        tooltipId="ssml-menu-header"
         tooltipText={formatMessage.rich('To learn more about SSML Tags, <a>go to this document</a>.', {
           a: ({ children }) => (
             <Link href="#" target="_blank">
@@ -43,7 +42,7 @@ export const LgSpeakModalityToolbar = React.memo((props: Props) => {
         })}
       />
     ),
-    [id]
+    []
   );
 
   const subMenuProps = React.useMemo(

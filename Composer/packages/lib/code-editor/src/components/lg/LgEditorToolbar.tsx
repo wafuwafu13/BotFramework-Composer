@@ -32,8 +32,6 @@ const moreButtonStyles = {
 const commandBarStyles = {
   root: {
     height: menuHeight,
-    border: `1px solid ${NeutralColors.gray120}`,
-    borderBottom: 'none',
     padding: 0,
     fontSize: FluentTheme.fonts.small.fontSize,
   },
@@ -44,10 +42,11 @@ export type LgEditorToolbarProps = {
   properties?: readonly string[];
   onSelectToolbarMenuItem: (itemText: string) => void;
   moreToolbarItems?: readonly ICommandBarItemProps[];
+  className?: string;
 };
 
 export const LgEditorToolbar = React.memo((props: LgEditorToolbarProps) => {
-  const { properties, lgTemplates, moreToolbarItems, onSelectToolbarMenuItem } = props;
+  const { className, properties, lgTemplates, moreToolbarItems, onSelectToolbarMenuItem } = props;
 
   const { functionRefPayload, propertyRefPayload, templateRefPayload } = useLgEditorToolbarItems(
     lgTemplates ?? [],
@@ -114,5 +113,5 @@ export const LgEditorToolbar = React.memo((props: LgEditorToolbarProps) => {
     [fixedItems, moreItems]
   );
 
-  return <CommandBar items={items} styles={commandBarStyles} />;
+  return <CommandBar className={className} items={items} styles={commandBarStyles} />;
 });

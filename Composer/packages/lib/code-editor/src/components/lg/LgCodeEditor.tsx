@@ -2,27 +2,28 @@
 // Licensed under the MIT License.
 
 import { LgTemplate } from '@botframework-composer/types';
+import styled from '@emotion/styled';
 import { EditorDidMount } from '@monaco-editor/react';
+import { FluentTheme, NeutralColors } from '@uifabric/fluent-theme';
 import formatMessage from 'format-message';
 import get from 'lodash/get';
 import { MonacoLanguageClient, MonacoServices } from 'monaco-languageclient';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
+import { Link } from 'office-ui-fabric-react/lib/Link';
 import { Stack } from 'office-ui-fabric-react/lib/Stack';
 import { Text } from 'office-ui-fabric-react/lib/Text';
 import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
-import { Link } from 'office-ui-fabric-react/lib/Link';
 import React, { useEffect, useState } from 'react';
 import { listen, MessageConnection } from 'vscode-ws-jsonrpc';
-import { FluentTheme, NeutralColors } from '@uifabric/fluent-theme';
 
 import { BaseEditor, BaseEditorProps, OnInit } from '../../BaseEditor';
 import { LG_HELP } from '../../constants';
 import { registerLGLanguage } from '../../languages';
 import { LGOption } from '../../utils';
-import { createLanguageClient, createUrl, createWebSocket, sendRequestWithRetry } from '../../utils/lspUtil';
 import { computeRequiredEdits } from '../../utils/lgUtils';
+import { createLanguageClient, createUrl, createWebSocket, sendRequestWithRetry } from '../../utils/lspUtil';
 
-import { LgEditorToolbar } from './LgEditorToolbar';
+import { LgEditorToolbar as DefaultLgEditorToolbar } from './LgEditorToolbar';
 
 const placeholder = formatMessage(
   `> To learn more about the LG file format, read the documentation at
@@ -40,6 +41,11 @@ const linkStyles = {
 
 const fontSize12Style = { root: { fontSize: FluentTheme.fonts.small.fontSize } };
 const grayTextStyle = { root: { color: NeutralColors.gray80, fontSize: FluentTheme.fonts.small.fontSize } };
+
+const LgEditorToolbar = styled(DefaultLgEditorToolbar)({
+  border: `1px solid ${NeutralColors.gray120}`,
+  borderBottom: 'none',
+});
 
 export interface LgCodeEditorProps extends BaseEditorProps {
   lgTemplates?: readonly LgTemplate[];
