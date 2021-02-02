@@ -160,7 +160,7 @@ export const LgCodeEditor = (props: LgCodeEditorProps) => {
 
   const navigateToLgPage = React.useCallback(() => {
     onNavigateToLgPage?.(lgOption?.fileId ?? 'common');
-  }, [onNavigateToLgPage]);
+  }, [onNavigateToLgPage, lgOption?.fileId]);
 
   return (
     <Stack>

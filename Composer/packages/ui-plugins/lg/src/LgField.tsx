@@ -129,9 +129,12 @@ const LgField: React.FC<FieldProps<string>> = (props) => {
 
   const navigateToLgPage = React.useCallback(
     (lgFileId: string) => {
+      // eslint-disable-next-line security/detect-non-literal-regexp
+      const pattern = new RegExp(`.${locale}`, 'g');
+      lgFileId = lgFileId.replace(pattern, '');
       shellApi.navigateTo(`/bot/${projectId}/language-generation/${lgFileId}`);
     },
-    [shellApi, projectId]
+    [shellApi, projectId, locale]
   );
 
   const updateModalityLgTemplate = React.useCallback(
