@@ -33,7 +33,6 @@ import {
 } from './utils';
 
 // define init methods call from client
-const fetchPropertiesMethodName = 'fetchProperties';
 const initializeDocumentsMethodName = 'initializeDocuments';
 
 const { ROOT, TEMPLATENAME, TEMPLATEBODY, EXPRESSION, COMMENTS, SINGLE, DOUBLE, STRUCTURELG } = LGCursorState;
@@ -94,9 +93,6 @@ export class LGServer {
           this.validateLgOption(textDocument, lgOption);
           this.validate(textDocument);
         }
-      } else if (fetchPropertiesMethodName === method) {
-        const { projectId }: { projectId: string } = params;
-        this.connection.sendNotification('properties', { result: this.memoryResolver?.(projectId) });
       }
     });
   }

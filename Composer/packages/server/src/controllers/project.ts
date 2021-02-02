@@ -576,6 +576,26 @@ async function createProjectAsync(req: Request, jobId: string) {
   }
 }
 
+async function getVariablesByProjectId(req: Request, res: Response) {
+  const projectId = req.params.projectId;
+  const user = await ExtensionContext.getUserFromRequest(req);
+  const project = await BotProjectService.getProjectById(projectId, user);
+
+  if (project !== undefined) {
+    try {
+      const variables = await BotProjectService.staticMemoryResolver(projectId);
+      res.status(200).json({ variables });
+    } catch (e) {
+      log('Failed to fetch memory variables for project %s: %O', projectId, e);
+      res.status(500).json(e);
+    }
+  } else {
+    res.status(404).json({
+      message: `Could not find bot project with ID: ${projectId}`,
+    });
+  }
+}
+
 export const ProjectController = {
   getProjectById,
   openProject,
@@ -598,4 +618,5 @@ export const ProjectController = {
   getProjectByAlias,
   backupProject,
   copyTemplateToExistingProject,
+  getVariablesByProjectId,
 };

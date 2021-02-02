@@ -189,6 +189,11 @@ export function useShell(source: EventSource, projectId: string): Shell {
     updateZoomRate({ currentRate });
   }
 
+  async function getMemoryVariables(projectId: string) {
+    const res = await httpClient.get<{ variables: string[] }>(`/projects/${projectId}/variables`);
+    return res.data?.variables ?? [];
+  }
+
   dialogMapRef.current = dialogsMap;
 
   const api: ShellApi = {
@@ -271,6 +276,7 @@ export function useShell(source: EventSource, projectId: string): Shell {
     updateUserSettings,
     confirm: OpenConfirmModal,
     telemetryClient: TelemetryClient,
+    getMemoryVariables,
   };
 
   const currentDialog = useMemo(() => {

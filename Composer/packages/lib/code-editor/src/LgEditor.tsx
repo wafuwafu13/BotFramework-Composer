@@ -13,6 +13,11 @@ export type LgEditorProps = LgCodeEditorProps & {
 };
 
 export const LgEditor = (props: LgEditorProps) => {
-  const { mode, ...editorProps } = props;
-  return mode === 'codeEditor' ? <LgCodeEditor {...editorProps} /> : <LgResponseEditor {...editorProps} />;
+  const { mode, memoryVariables, ...editorProps } = props;
+
+  return mode === 'codeEditor' ? (
+    <LgCodeEditor memoryVariables={memoryVariables} {...editorProps} />
+  ) : (
+    <LgResponseEditor memoryVariables={memoryVariables} {...editorProps} />
+  );
 };

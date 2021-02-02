@@ -11,7 +11,7 @@ import { jsx } from '@emotion/core';
 import formatMessage from 'format-message';
 import { Link } from 'office-ui-fabric-react/lib/Link';
 import { Stack } from 'office-ui-fabric-react/lib/Stack';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { locateLgTemplatePosition } from './locateLgTemplatePosition';
 
@@ -62,6 +62,14 @@ const LgField: React.FC<FieldProps<string>> = (props) => {
   const fallbackLgFileId = `${currentDialog.lgFile}.${locale}`;
   const lgFile = relatedLgFile ?? lgFiles.find((f) => f.id === fallbackLgFileId);
   const lgFileId = lgFile?.id ?? fallbackLgFileId;
+
+  const [memoryVariables, setMemoryVariables] = useState<string[] | undefined>();
+  useEffect(() => {
+    (async () => {
+      const variables = await shellApi.getMemoryVariables(projectId);
+      setMemoryVariables(variables);
+    })();
+  }, [projectId, shellApi.getMemoryVariables]);
 
   const availableLgTemplates = React.useMemo(
     () =>
@@ -172,6 +180,7 @@ const LgField: React.FC<FieldProps<string>> = (props) => {
         }}
         lgOption={lgOption}
         lgTemplates={availableLgTemplates}
+        memoryVariables={memoryVariables}
         mode={editorMode}
         value={template.body}
         onChange={onChange}

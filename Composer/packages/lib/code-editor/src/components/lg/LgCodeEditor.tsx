@@ -49,6 +49,7 @@ const LgEditorToolbar = styled(DefaultLgEditorToolbar)({
 
 export interface LgCodeEditorProps extends BaseEditorProps {
   lgTemplates?: readonly LgTemplate[];
+  memoryVariables?: readonly string[];
   lgOption?: LGOption;
   onNavigateToLgPage?: (lgFileId: string) => void;
   languageServer?:
@@ -80,7 +81,15 @@ export const LgCodeEditor = (props: LgCodeEditorProps) => {
     ...props.options,
   };
 
-  const { lgOption, languageServer, onInit: onInitProp, lgTemplates, onNavigateToLgPage, ...restProps } = props;
+  const {
+    lgOption,
+    languageServer,
+    onInit: onInitProp,
+    memoryVariables,
+    lgTemplates,
+    onNavigateToLgPage,
+    ...restProps
+  } = props;
   const lgServer = languageServer || defaultLGServer;
 
   let editorId = '';
@@ -90,18 +99,6 @@ export const LgCodeEditor = (props: LgCodeEditorProps) => {
   }
 
   const [editor, setEditor] = useState<any>();
-  const [properties, setProperties] = useState<string[] | undefined>();
-
-  const fetchAvailableProperties = React.useCallback(async () => {
-    if (window.monacoLGEditorInstance) {
-      await window.monacoLGEditorInstance.onReady();
-      window.monacoLGEditorInstance.sendRequest('fetchProperties', { projectId: lgOption?.projectId });
-      window.monacoLGEditorInstance.onNotification('properties', (params: { result: string[] }) => {
-        const { result } = params;
-        setProperties(result);
-      });
-    }
-  }, []);
 
   useEffect(() => {
     if (!editor) return;
@@ -127,12 +124,10 @@ export const LgCodeEditor = (props: LgCodeEditorProps) => {
           const disposable = languageClient.start();
           connection.onClose(() => disposable.dispose());
           window.monacoLGEditorInstance = languageClient;
-          (async () => await fetchAvailableProperties())();
         },
       });
     } else {
       sendRequestWithRetry(window.monacoLGEditorInstance, 'initializeDocuments', { lgOption, uri });
-      (async () => await fetchAvailableProperties())();
     }
   }, [editor]);
 
@@ -171,7 +166,7 @@ export const LgCodeEditor = (props: LgCodeEditorProps) => {
     <Stack>
       <LgEditorToolbar
         lgTemplates={lgTemplates}
-        properties={properties}
+        properties={memoryVariables}
         onSelectToolbarMenuItem={selectToolbarMenuItem}
       />
       <BaseEditor
