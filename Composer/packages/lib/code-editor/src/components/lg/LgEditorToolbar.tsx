@@ -2,14 +2,16 @@
 // Licensed under the MIT License.
 
 import { LgTemplate } from '@botframework-composer/types';
-import { NeutralColors, FluentTheme } from '@uifabric/fluent-theme';
+import { FluentTheme, NeutralColors } from '@uifabric/fluent-theme';
 import formatMessage from 'format-message';
 import { CommandBar, ICommandBarItemProps } from 'office-ui-fabric-react/lib/CommandBar';
 import { VerticalDivider } from 'office-ui-fabric-react/lib/Divider';
+import { IContextualMenuProps } from 'office-ui-fabric-react/lib/ContextualMenu';
 import * as React from 'react';
 
 import { withTooltip } from '../../utils/withTooltip';
 
+import { jsLgToolbarMenuClassName } from './constants';
 import { useLgEditorToolbarItems } from './hooks/useLgEditorToolbarItems';
 import { ToolbarButtonMenu } from './ToolbarButtonMenu';
 
@@ -37,6 +39,28 @@ const commandBarStyles = {
   },
 };
 
+const join = (...strings: (string | undefined)[]) => strings.filter(Boolean).join(' ');
+
+const configureMenuProps = (props: IContextualMenuProps | undefined, className: string) => {
+  if (!props) {
+    return;
+  }
+
+  props.calloutProps = {
+    ...props.calloutProps,
+    layerProps: {
+      ...props.calloutProps?.layerProps,
+      className: join(props.calloutProps?.layerProps?.className, className),
+    },
+  };
+
+  for (const item of props.items) {
+    configureMenuProps(item.subMenuProps, className);
+  }
+
+  return props;
+};
+
 export type LgEditorToolbarProps = {
   lgTemplates?: readonly LgTemplate[];
   properties?: readonly string[];
@@ -45,7 +69,7 @@ export type LgEditorToolbarProps = {
   className?: string;
 };
 
-export const LgEditorToolbar = React.forwardRef<HTMLDivElement, LgEditorToolbarProps>((props, ref) => {
+export const LgEditorToolbar = React.memo((props: LgEditorToolbarProps) => {
   const { className, properties, lgTemplates, moreToolbarItems, onSelectToolbarMenuItem } = props;
 
   const { functionRefPayload, propertyRefPayload, templateRefPayload } = useLgEditorToolbarItems(
@@ -97,8 +121,12 @@ export const LgEditorToolbar = React.forwardRef<HTMLDivElement, LgEditorToolbarP
 
   const moreItems = React.useMemo(
     () =>
-      moreToolbarItems?.map<ICommandBarItemProps>((itemProps) => ({ ...itemProps, buttonStyles: moreButtonStyles })) ??
-      [],
+      moreToolbarItems?.map<ICommandBarItemProps>((itemProps) => ({
+        ...itemProps,
+        subMenuProps: configureMenuProps(itemProps.subMenuProps, jsLgToolbarMenuClassName),
+        buttonStyles: moreButtonStyles,
+        className: jsLgToolbarMenuClassName,
+      })) ?? [],
     [moreToolbarItems]
   );
 
@@ -113,9 +141,5 @@ export const LgEditorToolbar = React.forwardRef<HTMLDivElement, LgEditorToolbarP
     [fixedItems, moreItems]
   );
 
-  return (
-    <div ref={ref}>
-      <CommandBar className={className} items={items} styles={commandBarStyles} />
-    </div>
-  );
+  return <CommandBar className={className} items={items} styles={commandBarStyles} />;
 });

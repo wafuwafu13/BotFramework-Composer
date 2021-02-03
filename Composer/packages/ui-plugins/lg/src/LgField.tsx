@@ -69,7 +69,7 @@ const LgField: React.FC<FieldProps<string>> = (props) => {
       const variables = await shellApi.getMemoryVariables(projectId);
       setMemoryVariables(variables);
     })();
-  }, [projectId, shellApi.getMemoryVariables]);
+  }, [projectId, shellApi]);
 
   const availableLgTemplates = React.useMemo(
     () =>
@@ -137,24 +137,17 @@ const LgField: React.FC<FieldProps<string>> = (props) => {
     [shellApi, projectId, locale]
   );
 
-  const updateModalityLgTemplate = React.useCallback(
-    async (modality: string, body: string) => {
-      await shellApi.debouncedUpdateLgTemplate(lgFileId, `${lgName}_${modality}`, body);
-    },
-    [lgName, lgFileId]
-  );
-
   const handleModalityChange = React.useCallback(
-    (modality: string, body: string) => {
+    async (modality: string, body: string) => {
       if (designerId) {
         if (body) {
-          updateModalityLgTemplate(modality, body);
+          await shellApi.debouncedUpdateLgTemplate(lgFileId, `${lgName}_${modality}`, body);
         } else {
           shellApi.removeLgTemplate(lgFileId, `${lgName}_${modality}`);
         }
       }
     },
-    [designerId, lgFileId, lgName]
+    [designerId, lgFileId, lgName, shellApi]
   );
 
   return (

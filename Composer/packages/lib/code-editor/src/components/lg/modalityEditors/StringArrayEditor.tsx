@@ -45,7 +45,6 @@ type ArrayItemProps = {
 
 const ArrayItem = React.memo(({ value, onBlur, onChange, onShowCallout }: ArrayItemProps) => {
   const itemRef = useRef<ITextField | null>(null);
-  const containerRef = useRef(null);
 
   useEffect(() => {
     if (!value) {
@@ -53,39 +52,43 @@ const ArrayItem = React.memo(({ value, onBlur, onChange, onShowCallout }: ArrayI
     }
   }, []);
 
-  const handleFocus = () => {
-    onShowCallout(containerRef.current);
-  };
+  const handleFocus = React.useCallback(
+    (e: React.FocusEvent<HTMLInputElement>) => {
+      e.stopPropagation();
+      onShowCallout(e.target as HTMLInputElement);
+    },
+    [onShowCallout]
+  );
 
-  const handleKeyDown = (ev) => {
-    if (ev.key === 'Escape') {
-      onShowCallout(null);
-    }
-  };
+  const handleClick = React.useCallback(
+    (e: React.MouseEvent<HTMLInputElement>) => {
+      e.stopPropagation();
+      onShowCallout(e.target as HTMLInputElement);
+    },
+    [onShowCallout]
+  );
 
   return (
-    <div ref={containerRef}>
-      <Item
-        componentRef={(ref) => (itemRef.current = ref)}
-        styles={styles.textInput}
-        value={value}
-        onBlur={onBlur}
-        onFocus={handleFocus}
-        onChange={onChange}
-        onKeyDown={handleKeyDown}
-      />
-    </div>
+    <Item
+      componentRef={(ref) => (itemRef.current = ref)}
+      styles={styles.textInput}
+      value={value}
+      onBlur={onBlur}
+      onChange={onChange}
+      onClick={handleClick}
+      onFocus={handleFocus}
+    />
   );
 });
 
 type StringArrayEditorProps = {
   items: string[];
   onChange: (items: string[]) => void;
-  onShowCallout: (target) => void;
+  onShowCallout: (target: HTMLElement) => void;
 };
 
 const StringArrayEditor = React.memo(({ items, onChange, onShowCallout }: StringArrayEditorProps) => {
-  const [visible, setVisible] = useState(true);
+  const [addButtonVisible, setAddButtonVisible] = useState(true);
 
   const handleChange = useCallback(
     (index: number) => (_, newValue?: string) => {
@@ -97,13 +100,12 @@ const StringArrayEditor = React.memo(({ items, onChange, onShowCallout }: String
   );
 
   const handleBlur = useCallback(() => {
-    onChange(items.filter(Boolean));
-    setVisible(true);
+    setAddButtonVisible(true);
   }, [items, onChange]);
 
   const handleClickAddVariation = useCallback(() => {
     onChange([...items, '']);
-    setVisible(false);
+    setAddButtonVisible(false);
   }, [items, onChange]);
 
   return (
@@ -117,7 +119,7 @@ const StringArrayEditor = React.memo(({ items, onChange, onShowCallout }: String
           onShowCallout={onShowCallout}
         />
       ))}
-      {visible && (
+      {addButtonVisible && (
         <Link as="button" styles={styles.link} onClick={handleClickAddVariation}>
           {formatMessage('Add new variation')}
         </Link>

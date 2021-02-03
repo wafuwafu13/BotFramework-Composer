@@ -7,6 +7,6 @@ export type CommonModalityEditorProps = {
   removeModalityDisabled: boolean;
   template?: LgTemplate;
   onModalityChange: (body: string) => void;
-  onShowCallout: (target: HTMLDivElement | null) => void;
+  onShowCallout: (target: HTMLElement | null) => void;
   onRemoveModality: () => void;
 };

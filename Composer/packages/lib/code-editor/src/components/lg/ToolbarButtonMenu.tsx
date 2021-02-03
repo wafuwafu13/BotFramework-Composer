@@ -3,10 +3,10 @@
 
 import { buildInFunctionsMap, getBuiltInFunctionInsertText } from '@bfc/built-in-functions';
 import styled from '@emotion/styled';
-import { NeutralColors, FluentTheme } from '@uifabric/fluent-theme';
-import formatMessage from 'format-message';
-import { IconButton, IButton } from 'office-ui-fabric-react/lib/Button';
 import { createSvgIcon } from '@fluentui/react-icons';
+import { FluentTheme, NeutralColors } from '@uifabric/fluent-theme';
+import formatMessage from 'format-message';
+import { IconButton } from 'office-ui-fabric-react/lib/Button';
 import {
   ContextualMenuItem,
   IContextualMenuItem,
@@ -17,7 +17,7 @@ import {
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import { Label } from 'office-ui-fabric-react/lib/Label';
 import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
-import { Stack, IStackStyles } from 'office-ui-fabric-react/lib/Stack';
+import { IStackStyles, Stack } from 'office-ui-fabric-react/lib/Stack';
 import { Text } from 'office-ui-fabric-react/lib/Text';
 import { DirectionalHint } from 'office-ui-fabric-react/lib/Tooltip';
 import { IRenderFunction } from 'office-ui-fabric-react/lib/Utilities';
@@ -26,14 +26,15 @@ import * as React from 'react';
 import { computePropertyItemTree, getAllNodes } from '../../utils/lgUtils';
 import { withTooltip } from '../../utils/withTooltip';
 
+import { jsLgToolbarMenuClassName } from './constants';
 import { useDebounce } from './hooks/useDebounce';
 import { PropertyTreeItem } from './PropertyTreeItem';
 import {
-  ToolbarButtonPayload,
-  TemplateRefPayload,
   FunctionRefPayload,
-  PropertyRefPayload,
   PropertyItem,
+  PropertyRefPayload,
+  TemplateRefPayload,
+  ToolbarButtonPayload,
 } from './types';
 
 const propertiesSvgIcon = (
@@ -77,7 +78,12 @@ const OneLiner = styled.div({
 const svgIconStyle = { fill: NeutralColors.black, margin: '0 4px', width: 16, height: 16 };
 const iconStyles = { root: { color: NeutralColors.black, margin: '0 4px', width: 16, height: 16 } };
 const searchFieldStyles = { root: { borderRadius: 0 }, iconContainer: { display: 'none' } };
-const calloutProps = { styles: { calloutMain: { overflowY: 'hidden' } } };
+const calloutProps = {
+  styles: {
+    calloutMain: { overflowY: 'hidden' },
+  },
+  layerProps: { className: jsLgToolbarMenuClassName },
+};
 const itemsContainerStyles = { root: { overflowY: 'auto', maxHeight: 216, width: 200, overflowX: 'hidden' } };
 
 type ToolbarButtonMenuProps = {
@@ -134,7 +140,6 @@ export const ToolbarButtonMenu = React.memo((props: ToolbarButtonMenuProps) => {
   const [propertyTreeExpanded, setPropertyTreeExpanded] = React.useState<Record<string, boolean>>({});
   const [query, setQuery] = React.useState<string | undefined>();
   const debouncedQuery = useDebounce<string | undefined>(query, 300);
-  const buttonRef = React.useRef<IButton>(null);
   const uiStrings = React.useMemo(() => getStrings(payload.kind), [payload.kind]);
 
   const getContextualMenuItems = (): IContextualMenuItem[] => {
@@ -154,9 +159,11 @@ export const ToolbarButtonMenu = React.memo((props: ToolbarButtonMenuProps) => {
           return {
             key: grouping.key,
             text: grouping.name,
-            target: '_blank',
             subMenuProps: {
-              calloutProps: { calloutMaxHeight: 432 },
+              calloutProps: {
+                calloutMaxHeight: 432,
+                layerProps: { className: jsLgToolbarMenuClassName },
+              },
               contextualMenuItemAs: (itemProps: IContextualMenuItemProps) => {
                 return (
                   <TooltipItem
@@ -438,7 +445,7 @@ export const ToolbarButtonMenu = React.memo((props: ToolbarButtonMenuProps) => {
 
   return (
     <IconButton
-      componentRef={buttonRef}
+      className={jsLgToolbarMenuClassName}
       disabled={disabled}
       menuProps={menuProps}
       styles={buttonStyles}
