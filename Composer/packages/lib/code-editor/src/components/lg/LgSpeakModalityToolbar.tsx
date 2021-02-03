@@ -35,7 +35,7 @@ export const LgSpeakModalityToolbar = React.memo((props: Props) => {
         tooltipId="ssml-menu-header"
         tooltipText={formatMessage.rich('To learn more about SSML Tags, <a>go to this document</a>.', {
           a: ({ children }) => (
-            <Link href="#" target="_blank">
+            <Link key="ssml-menu-header-link" href="#" target="_blank">
               {children}
             </Link>
           ),

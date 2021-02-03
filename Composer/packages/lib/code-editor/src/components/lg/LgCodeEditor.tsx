@@ -11,7 +11,6 @@ import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import { Link } from 'office-ui-fabric-react/lib/Link';
 import { Stack } from 'office-ui-fabric-react/lib/Stack';
 import { Text } from 'office-ui-fabric-react/lib/Text';
-import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
 import React, { useEffect, useState } from 'react';
 import { listen, MessageConnection } from 'vscode-ws-jsonrpc';
 
@@ -21,6 +20,7 @@ import { registerLGLanguage } from '../../languages';
 import { LgCodeEditorProps } from '../../types';
 import { computeRequiredEdits } from '../../utils/lgUtils';
 import { createLanguageClient, createUrl, createWebSocket, sendRequestWithRetry } from '../../utils/lspUtil';
+import { withTooltip } from '../../utils/withTooltip';
 
 import { LgEditorToolbar as DefaultLgEditorToolbar } from './LgEditorToolbar';
 
@@ -38,8 +38,26 @@ const linkStyles = {
   },
 };
 
-const fontSize12Style = { root: { fontSize: FluentTheme.fonts.small.fontSize } };
+const botIconStyles = { root: { padding: '0 4px', fontSize: FluentTheme.fonts.small.fontSize } };
 const grayTextStyle = { root: { color: NeutralColors.gray80, fontSize: FluentTheme.fonts.small.fontSize } };
+
+const LgTemplateLink = withTooltip(
+  {
+    content: (
+      <Text variant="small">
+        {formatMessage.rich('Edit this template in<a>Bot Response view</a>', {
+          a: ({ children }) => (
+            <Text key="pageLink" variant="small">
+              <Icon iconName="Robot" styles={botIconStyles} />
+              {children}
+            </Text>
+          ),
+        })}
+      </Text>
+    ),
+  },
+  Link
+);
 
 const LgEditorToolbar = styled(DefaultLgEditorToolbar)({
   border: `1px solid ${NeutralColors.gray120}`,
@@ -169,24 +187,9 @@ export const LgCodeEditor = (props: LgCodeEditorProps) => {
       {onNavigateToLgPage && (
         <Stack horizontal verticalAlign="center">
           <Text styles={grayTextStyle}>{formatMessage('Template name: ')}</Text>
-          <TooltipHost
-            content={
-              <Stack horizontal styles={fontSize12Style}>
-                {formatMessage.rich('Edit this template in <a>Bot Response view</a>', {
-                  a: ({ children }) => (
-                    <Stack key="pageLink" horizontal tokens={{ childrenGap: 4, padding: '0 0 0 4px' }}>
-                      <Icon iconName="Robot" styles={fontSize12Style} />
-                      <Text styles={fontSize12Style}>{children}</Text>
-                    </Stack>
-                  ),
-                })}
-              </Stack>
-            }
-          >
-            <Link as="button" styles={linkStyles} onClick={navigateToLgPage}>
-              #{lgOption?.templateId}()
-            </Link>
-          </TooltipHost>
+          <LgTemplateLink as="button" styles={linkStyles} onClick={navigateToLgPage}>
+            #{lgOption?.templateId}()
+          </LgTemplateLink>
         </Stack>
       )}
     </Stack>

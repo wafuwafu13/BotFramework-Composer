@@ -138,7 +138,7 @@ const ModalityPivot = React.memo(({ lgOption, lgTemplates, onModalityChange = ()
           tooltipId="modality-add-menu-header"
           tooltipText={formatMessage.rich('To learn more about modalities, <a>go to this document</a>.', {
             a: ({ children }) => (
-              <Link href={modalityDocumentUrl} target="_blank">
+              <Link key="modality-add-menu-header-link" href={modalityDocumentUrl} target="_blank">
                 {children}
               </Link>
             ),

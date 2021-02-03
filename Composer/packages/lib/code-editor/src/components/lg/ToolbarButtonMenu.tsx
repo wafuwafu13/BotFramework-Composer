@@ -19,11 +19,12 @@ import { Label } from 'office-ui-fabric-react/lib/Label';
 import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
 import { Stack, IStackStyles } from 'office-ui-fabric-react/lib/Stack';
 import { Text } from 'office-ui-fabric-react/lib/Text';
-import { DirectionalHint, TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
+import { DirectionalHint } from 'office-ui-fabric-react/lib/Tooltip';
 import { IRenderFunction } from 'office-ui-fabric-react/lib/Utilities';
 import * as React from 'react';
 
 import { computePropertyItemTree, getAllNodes } from '../../utils/lgUtils';
+import { withTooltip } from '../../utils/withTooltip';
 
 import { useDebounce } from './hooks/useDebounce';
 import { PropertyTreeItem } from './PropertyTreeItem';
@@ -122,11 +123,10 @@ const getStrings = (kind: ToolbarButtonPayload['kind']) => {
   }
 };
 
-const TooltipItem = React.memo(({ text, tooltip }: { text?: string; tooltip?: string }) => (
-  <TooltipHost content={tooltip} directionalHint={DirectionalHint.topRightEdge}>
-    <OneLiner>{text}</OneLiner>
-  </TooltipHost>
-));
+const TooltipItem = React.memo(({ text, tooltip }: { text?: string; tooltip?: string }) => {
+  const OneLinerTooltip = withTooltip({ content: tooltip, directionalHint: DirectionalHint.topRightEdge }, OneLiner);
+  return <OneLinerTooltip>{text}</OneLinerTooltip>;
+});
 
 export const ToolbarButtonMenu = React.memo((props: ToolbarButtonMenuProps) => {
   const { payload, disabled = false } = props;

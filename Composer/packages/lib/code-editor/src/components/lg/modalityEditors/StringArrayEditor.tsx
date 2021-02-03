@@ -7,6 +7,7 @@ import { Link, ILinkStyles } from 'office-ui-fabric-react/lib/Link';
 import { NeutralColors } from '@uifabric/fluent-theme/lib/fluent/FluentColors';
 import { TextField, ITextField, ITextFieldStyles } from 'office-ui-fabric-react/lib/TextField';
 import formatMessage from 'format-message';
+import { FluentTheme } from '@uifabric/fluent-theme';
 
 const Item = styled(TextField)({
   borderBottom: `1px solid ${NeutralColors.gray30}`,
@@ -15,7 +16,13 @@ const Item = styled(TextField)({
 });
 
 const styles: { link: ILinkStyles; textInput: Partial<ITextFieldStyles> } = {
-  link: { root: { fontSize: 12, ':hover': { textDecoration: 'none' }, ':active': { textDecoration: 'none' } } },
+  link: {
+    root: {
+      fontSize: FluentTheme.fonts.small.fontSize,
+      ':hover': { textDecoration: 'none' },
+      ':active': { textDecoration: 'none' },
+    },
+  },
   textInput: {
     fieldGroup: {
       borderColor: 'transparent',
