@@ -11,8 +11,8 @@ const AttachmentModalityEditor = React.memo(
   ({ removeModalityDisabled: disableRemoveModality, onRemoveModality }: CommonModalityEditorProps) => {
     return (
       <ModalityEditorContainer
-        contentDescription="attachment help text"
-        contentTitle={formatMessage('Response Variations')}
+        contentDescription="List of attachments to send to users. Multiple attachments will be displayed simultaneously."
+        contentTitle={formatMessage('Attachments')}
         disableRemoveModality={disableRemoveModality}
         modalityTitle={formatMessage('Attachments')}
         modalityType="attachments"

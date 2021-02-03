@@ -3,9 +3,10 @@
 
 import * as React from 'react';
 
-import { LgCodeEditorProps } from './LgCodeEditor';
+import { LgResponseEditorProps } from '../../types';
+
 import { ModalityPivot } from './ModalityPivot';
 
-export const LgResponseEditor = (props: LgCodeEditorProps) => {
+export const LgResponseEditor = (props: LgResponseEditorProps) => {
   return <ModalityPivot {...props} />;
 };

@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { LgTemplate } from '@botframework-composer/types';
 import styled from '@emotion/styled';
 import { EditorDidMount } from '@monaco-editor/react';
 import { FluentTheme, NeutralColors } from '@uifabric/fluent-theme';
@@ -16,10 +15,10 @@ import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
 import React, { useEffect, useState } from 'react';
 import { listen, MessageConnection } from 'vscode-ws-jsonrpc';
 
-import { BaseEditor, BaseEditorProps, OnInit } from '../../BaseEditor';
+import { BaseEditor, OnInit } from '../../BaseEditor';
 import { LG_HELP } from '../../constants';
 import { registerLGLanguage } from '../../languages';
-import { LGOption } from '../../utils';
+import { LgCodeEditorProps } from '../../types';
 import { computeRequiredEdits } from '../../utils/lgUtils';
 import { createLanguageClient, createUrl, createWebSocket, sendRequestWithRetry } from '../../utils/lspUtil';
 
@@ -47,22 +46,6 @@ const LgEditorToolbar = styled(DefaultLgEditorToolbar)({
   borderBottom: 'none',
 });
 
-export interface LgCodeEditorProps extends BaseEditorProps {
-  lgTemplates?: readonly LgTemplate[];
-  memoryVariables?: readonly string[];
-  lgOption?: LGOption;
-  onNavigateToLgPage?: (lgFileId: string) => void;
-  languageServer?:
-    | {
-        host?: string;
-        hostname?: string;
-        port?: number | string;
-        path: string;
-      }
-    | string;
-  onModalityChange?: (modality: string, body: string) => void;
-}
-
 const defaultLGServer = {
   path: '/lg-language-server',
 };
@@ -82,6 +65,7 @@ export const LgCodeEditor = (props: LgCodeEditorProps) => {
   };
 
   const {
+    toolbarHidden,
     lgOption,
     languageServer,
     onInit: onInitProp,
@@ -164,11 +148,13 @@ export const LgCodeEditor = (props: LgCodeEditorProps) => {
 
   return (
     <Stack>
-      <LgEditorToolbar
-        lgTemplates={lgTemplates}
-        properties={memoryVariables}
-        onSelectToolbarMenuItem={selectToolbarMenuItem}
-      />
+      {!toolbarHidden && (
+        <LgEditorToolbar
+          lgTemplates={lgTemplates}
+          properties={memoryVariables}
+          onSelectToolbarMenuItem={selectToolbarMenuItem}
+        />
+      )}
       <BaseEditor
         helpURL={LG_HELP}
         id={editorId}

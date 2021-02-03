@@ -11,8 +11,8 @@ const SuggestedActionsModalityEditor = React.memo(
   ({ removeModalityDisabled: disableRemoveModality, onRemoveModality }: CommonModalityEditorProps) => {
     return (
       <ModalityEditorContainer
-        contentDescription="suggested actions help text"
-        contentTitle={formatMessage('Response Variations')}
+        contentDescription="This list of actions will be rendered as suggestions to user."
+        contentTitle={formatMessage('Actions')}
         disableRemoveModality={disableRemoveModality}
         modalityTitle={formatMessage('Suggested Actions')}
         modalityType="suggestedActions"
