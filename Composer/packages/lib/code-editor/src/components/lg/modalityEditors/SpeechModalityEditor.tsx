@@ -14,6 +14,7 @@ const SpeechModalityEditor = React.memo(
     template,
     onModalityChange,
     onRemoveModality,
+    onShowCallout,
   }: CommonModalityEditorProps) => {
     const [items, setItems] = useState<string[]>(template?.body?.replace(/- /g, '').split('\n') || []);
 
@@ -34,7 +35,7 @@ const SpeechModalityEditor = React.memo(
         modalityType="suggestedActions"
         onRemoveModality={onRemoveModality}
       >
-        <StringArrayEditor items={items} onChange={handleChange} />
+        <StringArrayEditor items={items} onChange={handleChange} onShowCallout={onShowCallout} />
       </ModalityEditorContainer>
     );
   }

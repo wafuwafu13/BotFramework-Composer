@@ -4,6 +4,7 @@
 import { LgTemplate } from '@bfc/shared';
 import { FluentTheme, FontSizes } from '@uifabric/fluent-theme';
 import formatMessage from 'format-message';
+import { Callout, DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
 import { IconButton } from 'office-ui-fabric-react/lib/Button';
 import {
   IContextualMenuProps,
@@ -15,7 +16,7 @@ import {
 import { Link } from 'office-ui-fabric-react/lib/Link';
 import { IPivotStyles, Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import { Stack } from 'office-ui-fabric-react/lib/Stack';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { LgResponseEditorProps } from '../../types';
 import { ItemWithTooltip } from '../ItemWithTooltip';
@@ -25,6 +26,7 @@ import { SpeechModalityEditor } from './modalityEditors/SpeechModalityEditor';
 import { SuggestedActionsModalityEditor } from './modalityEditors/SuggestedActionsModalityEditor';
 import { TextModalityEditor } from './modalityEditors/TextModalityEditor';
 import { ModalityType, modalityTypes } from './types';
+import { LgEditorToolbar } from './LgEditorToolbar';
 
 const modalityDocumentUrl =
   'https://docs.microsoft.com/en-us/azure/bot-service/language-generation/language-generation-structured-response-template?view=azure-bot-service-4.0';
@@ -61,6 +63,7 @@ const renderModalityEditor = (
   modality: ModalityType,
   onRemoveModality: (modality: ModalityType) => () => void,
   onModalityChange: (modality: ModalityType, body: string) => void,
+  onShowCallout: (target) => void,
   modalityTemplates: Record<ModalityType, LgTemplate>,
   disableRemoveModality: boolean
 ) => {
@@ -70,6 +73,7 @@ const renderModalityEditor = (
         <AttachmentModalityEditor
           removeModalityDisabled={disableRemoveModality}
           onModalityChange={(body: string) => onModalityChange('attachments', body)}
+          onShowCallout={onShowCallout}
           onRemoveModality={onRemoveModality('attachments')}
         />
       );
@@ -79,6 +83,7 @@ const renderModalityEditor = (
           removeModalityDisabled={disableRemoveModality}
           template={modalityTemplates.speak}
           onModalityChange={(body: string) => onModalityChange('speak', body)}
+          onShowCallout={onShowCallout}
           onRemoveModality={onRemoveModality('speak')}
         />
       );
@@ -87,6 +92,7 @@ const renderModalityEditor = (
         <SuggestedActionsModalityEditor
           removeModalityDisabled={disableRemoveModality}
           onModalityChange={(body: string) => onModalityChange('suggestedActions', body)}
+          onShowCallout={onShowCallout}
           onRemoveModality={onRemoveModality('suggestedActions')}
         />
       );
@@ -96,6 +102,7 @@ const renderModalityEditor = (
           removeModalityDisabled={disableRemoveModality}
           template={modalityTemplates.text}
           onModalityChange={(body: string) => onModalityChange('text', body)}
+          onShowCallout={onShowCallout}
           onRemoveModality={onRemoveModality('text')}
         />
       );
@@ -108,6 +115,9 @@ const getInitialModalities = (modalityTemplates: Record<ModalityType, LgTemplate
 };
 
 const ModalityPivot = React.memo(({ lgOption, lgTemplates, onModalityChange = () => {} }: LgResponseEditorProps) => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const toolbarRef = useRef<HTMLDivElement | null>(null);
+
   const modalityTemplates = useMemo(
     () =>
       modalityTypes.reduce((acc, modality) => {
@@ -225,6 +235,27 @@ const ModalityPivot = React.memo(({ lgOption, lgTemplates, onModalityChange = ()
     [menuItems, handleItemClick]
   );
 
+  const [target, setTarget] = useState(null);
+
+  const handleShowCallout = useCallback((target) => {
+    setTarget(target);
+  }, []);
+
+  useEffect(() => {
+    const handleFocus = (event: FocusEvent) => {
+      if (
+        !event.composedPath().includes(containerRef.current as Node) &&
+        !event.composedPath().includes(toolbarRef.current as Node)
+      ) {
+        setTarget(null);
+      }
+    };
+
+    document.addEventListener('focusin', handleFocus);
+
+    return () => document.removeEventListener('focusin', handleFocus);
+  }, []);
+
   return (
     <Stack>
       <Stack horizontal verticalAlign="center">
@@ -237,13 +268,25 @@ const ModalityPivot = React.memo(({ lgOption, lgTemplates, onModalityChange = ()
           <IconButton iconProps={addButtonIconProps} menuProps={addMenuProps} onRenderMenuIcon={() => null} />
         )}
       </Stack>
-      {renderModalityEditor(
-        selectedKey,
-        handleRemoveModality,
-        onModalityChange,
-        modalityTemplates,
-        modalities.length === 1
-      )}
+      <div ref={containerRef}>
+        {renderModalityEditor(
+          selectedKey,
+          handleRemoveModality,
+          onModalityChange,
+          handleShowCallout,
+          modalityTemplates,
+          modalities.length === 1
+        )}
+        <Callout
+          directionalHint={DirectionalHint.topLeftEdge}
+          hidden={!target}
+          isBeakVisible={false}
+          target={target}
+          doNotLayer={true}
+        >
+          <LgEditorToolbar ref={toolbarRef} onSelectToolbarMenuItem={() => {}} />
+        </Callout>
+      </div>
     </Stack>
   );
 });

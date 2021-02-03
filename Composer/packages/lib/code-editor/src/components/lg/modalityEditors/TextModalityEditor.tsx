@@ -13,6 +13,7 @@ const TextModalityEditor = React.memo(
     removeModalityDisabled: disableRemoveModality,
     template,
     onModalityChange,
+    onShowCallout,
     onRemoveModality,
   }: CommonModalityEditorProps) => {
     const [items, setItems] = useState<string[]>(template?.body?.replace(/- /g, '').split('\n') || []);
@@ -36,7 +37,7 @@ const TextModalityEditor = React.memo(
         modalityType="text"
         onRemoveModality={onRemoveModality}
       >
-        <StringArrayEditor items={items} onChange={handleChange} />
+        <StringArrayEditor items={items} onChange={handleChange} onShowCallout={onShowCallout} />
       </ModalityEditorContainer>
     );
   }

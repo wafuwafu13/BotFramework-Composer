@@ -152,6 +152,9 @@
   "add_custom_runtime_6b73dc44": {
     "message": "Add custom runtime"
   },
+  "add_modality_to_this_response_8974cc43": {
+    "message": "Add modality to this response"
+  },
   "add_multiple_comma_separated_synonyms_2639283f": {
     "message": "Add multiple comma-separated synonyms"
   },
@@ -941,6 +944,9 @@
   "display_lines_that_extends_beyond_the_width_of_the_9e500f3c": {
     "message": "Display lines that extends beyond the width of the editor on the next line."
   },
+  "display_text_used_by_the_channel_to_render_visuall_4e4ab704": {
+    "message": "Display text used by the channel to render visually."
+  },
   "do_you_want_to_proceed_cd35aa38": {
     "message": "Do you want to proceed?"
   },
@@ -1622,6 +1628,12 @@
   "list_count_values_33ea7088": {
     "message": "list - { count } values"
   },
+  "list_of_actions_rendered_as_suggestions_to_user_c0154e0b": {
+    "message": "List of actions rendered as suggestions to user."
+  },
+  "list_of_attachments_with_their_type_used_by_channe_7ecf0086": {
+    "message": "List of attachments with their type. Used by channels to render as UI cards or other generic file attachment types."
+  },
   "list_of_languages_that_bot_will_be_able_to_underst_e4851dc5": {
     "message": "List of languages that bot will be able to understand (User input) and respond to (Bot responses). To make this bot available in other languages, click ‘Manage bot languages’ to create a copy of the default language, and translate the content into the new language."
   },
@@ -2032,6 +2044,9 @@
   },
   "ondialogevents_types_3dc569b5": {
     "message": "OnDialogEvents Types"
+  },
+  "one_of_the_variations_added_below_will_be_selected_bee3c3f1": {
+    "message": "One of the variations added below will be selected at random by the LG library."
   },
   "open_an_existing_skill_fbd87273": {
     "message": "Open an existing skill"
@@ -2693,6 +2708,9 @@
   "speech_16063aed": {
     "message": "Speech"
   },
+  "spoken_text_used_by_the_channel_to_render_audibly_d07c7427": {
+    "message": "Spoken text used by the channel to render audibly."
+  },
   "ssml_tag_981a8aac": {
     "message": "SSML tag"
   },
@@ -2911,6 +2929,9 @@
   },
   "to_customize_the_welcome_message_select_the_i_send_9b4bf4f": {
     "message": "To customize the welcome message, select the <i>Send a response</i> action in the Visual Editor. Then in the Form Editor on the right, you can edit the bot''s welcome message in the <b>Language Generation</b> field."
+  },
+  "to_learn_more_about_modalities_a_go_to_this_docume_797a8117": {
+    "message": "To learn more about modalities, <a>go to this document</a>."
   },
   "to_learn_more_about_ssml_tags_a_go_to_this_documen_7df7b3ac": {
     "message": "To learn more about SSML Tags, <a>go to this document</a>."

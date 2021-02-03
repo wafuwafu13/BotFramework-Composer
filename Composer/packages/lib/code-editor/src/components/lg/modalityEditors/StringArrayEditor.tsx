@@ -33,10 +33,12 @@ type ArrayItemProps = {
   value: string;
   onBlur: () => void;
   onChange: (event, value?: string) => void;
+  onShowCallout: (target) => void;
 };
 
-const ArrayItem = React.memo(({ value, onBlur, onChange }: ArrayItemProps) => {
+const ArrayItem = React.memo(({ value, onBlur, onChange, onShowCallout }: ArrayItemProps) => {
   const itemRef = useRef<ITextField | null>(null);
+  const containerRef = useRef(null);
 
   useEffect(() => {
     if (!value) {
@@ -44,23 +46,38 @@ const ArrayItem = React.memo(({ value, onBlur, onChange }: ArrayItemProps) => {
     }
   }, []);
 
+  const handleFocus = () => {
+    onShowCallout(containerRef.current);
+  };
+
+  const handleKeyDown = (ev) => {
+    if (ev.key === 'Escape') {
+      onShowCallout(null);
+    }
+  };
+
   return (
-    <Item
-      componentRef={(ref) => (itemRef.current = ref)}
-      styles={styles.textInput}
-      value={value}
-      onBlur={onBlur}
-      onChange={onChange}
-    />
+    <div ref={containerRef}>
+      <Item
+        componentRef={(ref) => (itemRef.current = ref)}
+        styles={styles.textInput}
+        value={value}
+        onBlur={onBlur}
+        onFocus={handleFocus}
+        onChange={onChange}
+        onKeyDown={handleKeyDown}
+      />
+    </div>
   );
 });
 
 type StringArrayEditorProps = {
   items: string[];
   onChange: (items: string[]) => void;
+  onShowCallout: (target) => void;
 };
 
-const StringArrayEditor = React.memo(({ items, onChange }: StringArrayEditorProps) => {
+const StringArrayEditor = React.memo(({ items, onChange, onShowCallout }: StringArrayEditorProps) => {
   const [visible, setVisible] = useState(true);
 
   const handleChange = useCallback(
@@ -85,7 +102,13 @@ const StringArrayEditor = React.memo(({ items, onChange }: StringArrayEditorProp
   return (
     <React.Fragment>
       {items.map((value, key) => (
-        <ArrayItem key={key} value={value} onBlur={handleBlur} onChange={handleChange(key)} />
+        <ArrayItem
+          key={key}
+          value={value}
+          onBlur={handleBlur}
+          onChange={handleChange(key)}
+          onShowCallout={onShowCallout}
+        />
       ))}
       {visible && (
         <Link as="button" styles={styles.link} onClick={handleClickAddVariation}>

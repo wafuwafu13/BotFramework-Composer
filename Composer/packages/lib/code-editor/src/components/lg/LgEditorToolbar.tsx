@@ -45,7 +45,7 @@ export type LgEditorToolbarProps = {
   className?: string;
 };
 
-export const LgEditorToolbar = React.memo((props: LgEditorToolbarProps) => {
+export const LgEditorToolbar = React.forwardRef<HTMLDivElement, LgEditorToolbarProps>((props, ref) => {
   const { className, properties, lgTemplates, moreToolbarItems, onSelectToolbarMenuItem } = props;
 
   const { functionRefPayload, propertyRefPayload, templateRefPayload } = useLgEditorToolbarItems(
@@ -113,5 +113,9 @@ export const LgEditorToolbar = React.memo((props: LgEditorToolbarProps) => {
     [fixedItems, moreItems]
   );
 
-  return <CommandBar className={className} items={items} styles={commandBarStyles} />;
+  return (
+    <div ref={ref}>
+      <CommandBar className={className} items={items} styles={commandBarStyles} />
+    </div>
+  );
 });
