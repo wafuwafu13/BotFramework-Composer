@@ -5,8 +5,23 @@ import uniq from 'lodash/uniq';
 
 import { LgLanguageContext, PropertyItem } from '../components/lg/types';
 
-const templateStart = '- ';
-const templateStartRegex = /\s*-\s*.*$/;
+type MonacoPosition = {
+  lineNumber: number;
+  column: number;
+};
+
+type MonacoRange = {
+  startLineNumber: number;
+  startColumn: number;
+  endLineNumber: number;
+  endColumn: number;
+};
+
+type MonacoEdit = {
+  range: MonacoRange;
+  text: string;
+  forceMoveMarkers: boolean;
+};
 
 /**
  * This function returns the context of the current cursor position in an LG document.
@@ -14,8 +29,8 @@ const templateStartRegex = /\s*-\s*.*$/;
  */
 const getCursorContext = (editor: any) => {
   const state: LgLanguageContext[] = [];
-  const position = editor.getPosition() ?? { lineNumber: 1, column: 1 };
-  const range = {
+  const position: MonacoPosition = editor.getPosition() ?? { lineNumber: 1, column: 1 };
+  const range: MonacoRange = {
     startLineNumber: position.lineNumber,
     startColumn: 1,
     endLineNumber: position.lineNumber,
@@ -84,64 +99,30 @@ const getCursorContext = (editor: any) => {
  * @param text LG toolbar selected item text.
  * @param editor LG editor instance.
  */
-export const computeRequiredEdits = (
-  text: string,
-  editor: any
-): { range: any; text: string; forceMoveMarkers: boolean }[] | undefined => {
+export const computeRequiredEdits = (text: string, editor: any): MonacoEdit[] | undefined => {
   if (editor) {
-    const position = editor.getPosition() ?? { lineNumber: 1, column: 1 };
-    let value = editor.getModel()?.getLineContent(position.lineNumber) ?? '';
-    const selection = editor.getSelection();
+    const position: MonacoPosition = editor.getPosition() ?? { lineNumber: 1, column: 1 };
+    const selection: MonacoRange = editor.getSelection();
     const textSelected = selection?.startColumn !== editor.getSelection()?.endColumn;
-    let selectedValue = '';
-
-    if (selection && textSelected) {
-      value = editor.getModel()?.getValueInRange({ ...selection, startColumn: 1 }) ?? '';
-      selectedValue = editor.getModel()?.getValueInRange(selection) ?? '';
-      value = value.replace(selectedValue, '');
-    }
-
-    const hasDash = templateStartRegex.test(value);
 
     const context = getCursorContext(editor);
 
     const insertText = context === 'expression' ? text : `\${${text}}`;
 
-    const edits: { range: any; text: string; forceMoveMarkers: boolean }[] = [];
-
-    if (!hasDash) {
-      edits.push({
-        range:
-          textSelected && selection
-            ? {
-                startLineNumber: selection.startLineNumber,
-                startColumn: 1,
-                endLineNumber: selection.startLineNumber,
-                endColumn: templateStart.length,
-              }
-            : {
-                startLineNumber: position.lineNumber,
-                startColumn: 1,
-                endLineNumber: position.lineNumber,
-                endColumn: templateStart.length,
-              },
-        text: templateStart,
-        forceMoveMarkers: textSelected,
-      });
-    }
+    const edits: MonacoEdit[] = [];
 
     edits.push({
       range:
         textSelected && selection
           ? {
               startLineNumber: selection.startLineNumber,
-              startColumn: selection.startColumn + (hasDash ? 0 : templateStart.length),
+              startColumn: selection.startColumn,
               endLineNumber: selection.endLineNumber,
               endColumn: selection.endColumn,
             }
           : {
               startLineNumber: position.lineNumber,
-              startColumn: position.column + (hasDash ? 0 : templateStart.length),
+              startColumn: position.column,
               endLineNumber: position.lineNumber,
               endColumn: position.column,
             },

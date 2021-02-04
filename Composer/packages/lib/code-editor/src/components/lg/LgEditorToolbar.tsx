@@ -97,12 +97,24 @@ export const LgEditorToolbar = React.memo((props: LgEditorToolbarProps) => {
       {
         key: 'templateRef',
         disabled: !templateRefPayload?.data?.templates?.length,
-        commandBarButtonAs: () => <TooltipTemplateButton key="templateRef" payload={templateRefPayload} />,
+        commandBarButtonAs: () => (
+          <TooltipTemplateButton
+            key="templateRef"
+            disabled={!templateRefPayload?.data?.templates?.length}
+            payload={templateRefPayload}
+          />
+        ),
       },
       {
         key: 'propertyRef',
         disabled: !propertyRefPayload?.data?.properties?.length,
-        commandBarButtonAs: () => <TooltipPropertyButton key="propertyRef" payload={propertyRefPayload} />,
+        commandBarButtonAs: () => (
+          <TooltipPropertyButton
+            key="propertyRef"
+            disabled={!propertyRefPayload?.data?.properties?.length}
+            payload={propertyRefPayload}
+          />
+        ),
       },
       {
         key: 'functionRef',
