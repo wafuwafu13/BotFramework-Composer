@@ -3,22 +3,22 @@
 
 /* eslint-disable react/display-name */
 /** @jsx jsx */
-import { jsx } from '@emotion/core';
-import React, { useState, useEffect, useMemo, useCallback, Fragment } from 'react';
-import { LgEditor, EditorDidMount } from '@bfc/code-editor';
-import get from 'lodash/get';
-import debounce from 'lodash/debounce';
-import { filterTemplateDiagnostics } from '@bfc/indexers';
-import { RouteComponentProps } from '@reach/router';
-import querystring from 'query-string';
-import { CodeEditorSettings } from '@bfc/shared';
-import { useRecoilValue } from 'recoil';
+import { EditorDidMount, LgEditor } from '@bfc/code-editor';
 import { LgFile } from '@bfc/extension-client';
+import { filterTemplateDiagnostics } from '@bfc/indexers';
+import { CodeEditorSettings } from '@bfc/shared';
+import { jsx } from '@emotion/core';
+import { RouteComponentProps } from '@reach/router';
+import debounce from 'lodash/debounce';
+import get from 'lodash/get';
+import querystring from 'query-string';
+import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { useRecoilValue } from 'recoil';
 
+import { dispatcherState, userSettingsState } from '../../recoilModel';
 import { localeState, settingsState } from '../../recoilModel/atoms/botState';
-import { userSettingsState, dispatcherState } from '../../recoilModel';
-import { DiffCodeEditor } from '../language-understanding/diff-editor';
 import { lgFilesSelectorFamily } from '../../recoilModel/selectors/lg';
+import { DiffCodeEditor } from '../language-understanding/diff-editor';
 
 const lspServerPath = '/lg-language-server';
 
@@ -45,6 +45,7 @@ const CodeEditor: React.FC<CodeEditorProps> = (props) => {
     updateLgFile: updateLgFileDispatcher,
     updateUserSettings,
     setLocale,
+    getMemoryVariables,
   } = useRecoilValue(dispatcherState);
 
   const file: LgFile | undefined = lgFileId
@@ -58,6 +59,7 @@ const CodeEditor: React.FC<CodeEditorProps> = (props) => {
   const diagnostics = get(file, 'diagnostics', []);
   const [errorMsg, setErrorMsg] = useState('');
   const [lgEditor, setLgEditor] = useState<any>(null);
+  const [memoryVariables, setMemoryVariables] = useState<string[] | undefined>();
 
   const search = props.location?.search ?? '';
   const searchTemplateName = querystring.parse(search).t;
@@ -84,6 +86,15 @@ const CodeEditor: React.FC<CodeEditorProps> = (props) => {
   const editorDidMount: EditorDidMount = (_getValue, lgEditor) => {
     setLgEditor(lgEditor);
   };
+
+  React.useEffect(() => {
+    (async () => {
+      if (projectId) {
+        const variables = await getMemoryVariables(projectId);
+        setMemoryVariables(variables);
+      }
+    })();
+  }, [projectId]);
 
   useEffect(() => {
     if (lgEditor) {
@@ -169,6 +180,8 @@ const CodeEditor: React.FC<CodeEditorProps> = (props) => {
           path: lspServerPath,
         }}
         lgOption={lgOption}
+        lgTemplates={file?.allTemplates}
+        memoryVariables={memoryVariables}
         mode="codeEditor"
         value={content}
         onChange={onChange}
@@ -177,22 +190,22 @@ const CodeEditor: React.FC<CodeEditorProps> = (props) => {
     );
   }, [lgOption]);
 
-  const defaultLanguageFileEditor = useMemo(() => {
-    return (
-      <LgEditor
-        editorSettings={userSettings.codeEditor}
-        lgOption={{
-          fileId: dialogId,
-        }}
-        mode="codeEditor"
-        options={{
-          readOnly: true,
-        }}
-        value={defaultLangContent}
-        onChange={() => {}}
-      />
-    );
-  }, [dialogId]);
+  const defaultLanguageFileEditor = (
+    <LgEditor
+      editorSettings={userSettings.codeEditor}
+      lgOption={{
+        fileId: dialogId,
+      }}
+      lgTemplates={file?.allTemplates}
+      memoryVariables={memoryVariables}
+      mode="codeEditor"
+      options={{
+        readOnly: true,
+      }}
+      value={defaultLangContent}
+      onChange={() => {}}
+    />
+  );
 
   return (
     <Fragment>
