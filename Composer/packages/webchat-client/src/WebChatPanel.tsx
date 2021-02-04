@@ -102,7 +102,7 @@ export const WebChatPanel: React.FC<WebChatPanelProps> = ({ botUrl, secrets, dir
         <ReactWebChat
           key={directlineObj.conversationId}
           directLine={directlineObj}
-          disabled={false}
+          disabled={!botUrl}
           store={webchatStore}
           // reference: https://github.com/microsoft/BotFramework-WebChat/blob/master/packages/component/src/Styles/defaultStyleOptions.js
           styleOptions={{}}

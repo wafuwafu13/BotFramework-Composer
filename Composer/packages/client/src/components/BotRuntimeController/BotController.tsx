@@ -331,6 +331,7 @@ const BotController: React.FC = () => {
         onClick={openWebChatPanel}
       />
       <Panel
+        isHiddenOnDismiss
         closeButtonAriaLabel={formatMessage('Close')}
         customWidth={'390px'}
         headerText={projectName}
