@@ -43,6 +43,7 @@ import { dialogsWithLuProviderSelectorFamily, skillsStateSelector } from '../rec
 import { navigateTo } from '../utils/navigation';
 import TelemetryClient from '../telemetry/TelemetryClient';
 import { lgFilesSelectorFamily } from '../recoilModel/selectors/lg';
+import { getMemoryVariables } from '../recoilModel/dispatchers/utils/project';
 
 import { useLgApi } from './lgApi';
 import { useLuApi } from './luApi';
@@ -118,7 +119,6 @@ export function useShell(source: EventSource, projectId: string): Shell {
     updateSkillsDataInBotProjectFile: updateEndpointInBotProjectFile,
     updateZoomRate,
     reloadProject,
-    getMemoryVariables,
     setApplicationLevelError,
     updateRecognizer,
   } = useRecoilValue(dispatcherState);

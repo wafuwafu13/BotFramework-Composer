@@ -761,3 +761,8 @@ export const checkIfBotExistsInBotProjectFile = async (
   }
   return false;
 };
+
+export const getMemoryVariables = async (projectId: string) => {
+  const res = await httpClient.get<{ variables: string[] }>(`/projects/${projectId}/variables`);
+  return res.data?.variables ?? [];
+};

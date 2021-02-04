@@ -532,11 +532,6 @@ export const projectDispatcher = () => {
     setError(callbackHelpers, error);
   });
 
-  const getMemoryVariables = async (projectId: string) => {
-    const res = await httpClient.get<{ variables: string[] }>(`/projects/${projectId}/variables`);
-    return res.data?.variables ?? [];
-  };
-
   return {
     openProject,
     createNewBot,
@@ -558,6 +553,5 @@ export const projectDispatcher = () => {
     updateCreationMessage,
     setCurrentProjectId,
     setProjectError,
-    getMemoryVariables,
   };
 };

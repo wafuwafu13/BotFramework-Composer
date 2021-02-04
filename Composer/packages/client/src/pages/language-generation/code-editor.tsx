@@ -17,6 +17,7 @@ import { useRecoilValue } from 'recoil';
 
 import { dispatcherState, userSettingsState } from '../../recoilModel';
 import { localeState, settingsState } from '../../recoilModel/atoms/botState';
+import { getMemoryVariables } from '../../recoilModel/dispatchers/utils/project';
 import { lgFilesSelectorFamily } from '../../recoilModel/selectors/lg';
 import { DiffCodeEditor } from '../language-understanding/diff-editor';
 
@@ -45,7 +46,6 @@ const CodeEditor: React.FC<CodeEditorProps> = (props) => {
     updateLgFile: updateLgFileDispatcher,
     updateUserSettings,
     setLocale,
-    getMemoryVariables,
   } = useRecoilValue(dispatcherState);
 
   const file: LgFile | undefined = lgFileId
