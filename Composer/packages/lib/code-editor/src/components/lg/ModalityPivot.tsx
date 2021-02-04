@@ -4,7 +4,6 @@
 import { LgTemplate } from '@bfc/shared';
 import { FluentTheme, FontSizes } from '@uifabric/fluent-theme';
 import formatMessage from 'format-message';
-import { Callout, DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
 import { IconButton } from 'office-ui-fabric-react/lib/Button';
 import {
   IContextualMenuProps,
@@ -16,9 +15,10 @@ import {
 import { Link } from 'office-ui-fabric-react/lib/Link';
 import { IPivotStyles, Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import { Stack } from 'office-ui-fabric-react/lib/Stack';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 
 import { LgResponseEditorProps } from '../../types';
+import { LGOption } from '../../utils';
 import { ItemWithTooltip } from '../ItemWithTooltip';
 
 import { AttachmentModalityEditor } from './modalityEditors/AttachmentModalityEditor';
@@ -26,9 +26,6 @@ import { SpeechModalityEditor } from './modalityEditors/SpeechModalityEditor';
 import { SuggestedActionsModalityEditor } from './modalityEditors/SuggestedActionsModalityEditor';
 import { TextModalityEditor } from './modalityEditors/TextModalityEditor';
 import { ModalityType, modalityTypes } from './types';
-import { LgEditorToolbar } from './LgEditorToolbar';
-import { LgSpeakModalityToolbar, SSMLTagType } from './LgSpeakModalityToolbar';
-import { jsLgToolbarMenuClassName } from './constants';
 
 const modalityDocumentUrl =
   'https://docs.microsoft.com/en-us/azure/bot-service/language-generation/language-generation-structured-response-template?view=azure-bot-service-4.0';
@@ -65,9 +62,11 @@ const renderModalityEditor = (
   modality: ModalityType,
   onRemoveModality: (modality: ModalityType) => () => void,
   onModalityChange: (modality: ModalityType, body: string) => void,
-  onShowCallout: (target) => void,
   modalityTemplates: Record<ModalityType, LgTemplate>,
-  disableRemoveModality: boolean
+  disableRemoveModality: boolean,
+  lgOption?: LGOption,
+  lgTemplates?: readonly LgTemplate[],
+  memoryVariables?: readonly string[]
 ) => {
   switch (modality) {
     case 'attachments':
@@ -76,17 +75,18 @@ const renderModalityEditor = (
           removeModalityDisabled={disableRemoveModality}
           onModalityChange={(body: string) => onModalityChange('attachments', body)}
           onRemoveModality={onRemoveModality('attachments')}
-          onShowCallout={onShowCallout}
         />
       );
     case 'speak':
       return (
         <SpeechModalityEditor
           removeModalityDisabled={disableRemoveModality}
+          lgOption={lgOption}
+          lgTemplates={lgTemplates}
+          memoryVariables={memoryVariables}
           template={modalityTemplates.speak}
           onModalityChange={(body: string) => onModalityChange('speak', body)}
           onRemoveModality={onRemoveModality('speak')}
-          onShowCallout={onShowCallout}
         />
       );
     case 'suggestedActions':
@@ -95,17 +95,18 @@ const renderModalityEditor = (
           removeModalityDisabled={disableRemoveModality}
           onModalityChange={(body: string) => onModalityChange('suggestedActions', body)}
           onRemoveModality={onRemoveModality('suggestedActions')}
-          onShowCallout={onShowCallout}
         />
       );
     case 'text':
       return (
         <TextModalityEditor
           removeModalityDisabled={disableRemoveModality}
+          lgOption={lgOption}
+          lgTemplates={lgTemplates}
+          memoryVariables={memoryVariables}
           template={modalityTemplates.text}
           onModalityChange={(body: string) => onModalityChange('text', body)}
           onRemoveModality={onRemoveModality('text')}
-          onShowCallout={onShowCallout}
         />
       );
   }
@@ -236,75 +237,6 @@ const ModalityPivot = React.memo((props: LgResponseEditorProps) => {
     [menuItems, handleItemClick]
   );
 
-  const [calloutTargetElement, setCalloutTargetElement] = useState<HTMLElement | null>(null);
-
-  const handleShowCallout = useCallback((targetElement: HTMLElement) => {
-    setCalloutTargetElement(targetElement);
-  }, []);
-
-  useEffect(() => {
-    const keydownHandler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setCalloutTargetElement(null);
-      }
-    };
-
-    const focusHandler = (e: FocusEvent) => {
-      if (containerRef.current?.contains(e.target as Node)) {
-        return;
-      }
-
-      if (
-        !e
-          .composedPath()
-          .filter((n) => n instanceof Element)
-          .map((n) => (n as Element).className)
-          .some((c) => c.indexOf(jsLgToolbarMenuClassName) !== -1)
-      ) {
-        setCalloutTargetElement(null);
-      }
-    };
-
-    document.addEventListener('keydown', keydownHandler);
-    document.addEventListener('focusin', focusHandler);
-
-    return () => {
-      document.removeEventListener('keydown', keydownHandler);
-      document.removeEventListener('focusin', focusHandler);
-    };
-  }, []);
-
-  const selectToolbarMenuItem = React.useCallback((insertText: string) => {
-    // eslint-disable-next-line no-console
-    console.log(insertText);
-  }, []);
-
-  const insertSSMLTag = React.useCallback((ssmlTagType: SSMLTagType) => {
-    // eslint-disable-next-line no-console
-    console.log(ssmlTagType);
-  }, []);
-
-  const toolbar = React.useMemo(
-    () =>
-      selectedKey === 'speak' ? (
-        <LgSpeakModalityToolbar
-          key="lg-speak-toolbar"
-          lgTemplates={lgTemplates}
-          properties={memoryVariables}
-          onInsertSSMLTag={insertSSMLTag}
-          onSelectToolbarMenuItem={selectToolbarMenuItem}
-        />
-      ) : (
-        <LgEditorToolbar
-          key="lg-toolbar"
-          lgTemplates={lgTemplates}
-          properties={memoryVariables}
-          onSelectToolbarMenuItem={selectToolbarMenuItem}
-        />
-      ),
-    [selectedKey, lgTemplates, memoryVariables, insertSSMLTag, selectToolbarMenuItem]
-  );
-
   return (
     <Stack>
       <Stack horizontal verticalAlign="center">
@@ -323,20 +255,11 @@ const ModalityPivot = React.memo((props: LgResponseEditorProps) => {
           selectedKey,
           handleRemoveModality,
           onModalityChange,
-          handleShowCallout,
           modalityTemplates,
-          modalities.length === 1
-        )}
-
-        {calloutTargetElement && (
-          <Callout
-            directionalHint={DirectionalHint.topLeftEdge}
-            gapSpace={2}
-            isBeakVisible={false}
-            target={calloutTargetElement}
-          >
-            {toolbar}
-          </Callout>
+          modalities.length === 1,
+          lgOption,
+          lgTemplates,
+          memoryVariables
         )}
       </div>
     </Stack>

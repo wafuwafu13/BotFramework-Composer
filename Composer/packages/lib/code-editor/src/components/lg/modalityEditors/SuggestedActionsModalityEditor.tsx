@@ -5,7 +5,7 @@ import formatMessage from 'format-message';
 import React from 'react';
 
 import { ModalityEditorContainer } from './ModalityEditorContainer';
-import { CommonModalityEditorProps } from './types';
+import { CommonModalityEditorProps } from '../types';
 
 const SuggestedActionsModalityEditor = React.memo(
   ({ removeModalityDisabled: disableRemoveModality, onRemoveModality }: CommonModalityEditorProps) => {

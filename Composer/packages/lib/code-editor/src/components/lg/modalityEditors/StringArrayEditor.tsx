@@ -3,11 +3,17 @@
 
 import React, { useEffect, useCallback, useRef, useState } from 'react';
 import styled from '@emotion/styled';
+import { Callout, DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
 import { Link, ILinkStyles } from 'office-ui-fabric-react/lib/Link';
 import { NeutralColors } from '@uifabric/fluent-theme/lib/fluent/FluentColors';
 import { TextField, ITextField, ITextFieldStyles } from 'office-ui-fabric-react/lib/TextField';
 import formatMessage from 'format-message';
 import { FluentTheme } from '@uifabric/fluent-theme';
+import { LgEditorToolbar } from '../LgEditorToolbar';
+import { LgSpeakModalityToolbar, SSMLTagType } from '../LgSpeakModalityToolbar';
+import { jsLgToolbarMenuClassName } from '../constants';
+import { LgTemplate } from '@bfc/shared';
+import { LGOption } from '../../../utils';
 
 const Item = styled(TextField)({
   borderBottom: `1px solid ${NeutralColors.gray30}`,
@@ -40,10 +46,11 @@ type ArrayItemProps = {
   value: string;
   onBlur: () => void;
   onChange: (event, value?: string) => void;
+  onFocus: () => void;
   onShowCallout: (target) => void;
 };
 
-const ArrayItem = React.memo(({ value, onBlur, onChange, onShowCallout }: ArrayItemProps) => {
+const ArrayItem = React.memo(({ value, onBlur, onChange, onFocus, onShowCallout }: ArrayItemProps) => {
   const itemRef = useRef<ITextField | null>(null);
 
   useEffect(() => {
@@ -56,6 +63,7 @@ const ArrayItem = React.memo(({ value, onBlur, onChange, onShowCallout }: ArrayI
     (e: React.FocusEvent<HTMLInputElement>) => {
       e.stopPropagation();
       onShowCallout(e.target as HTMLInputElement);
+      onFocus();
     },
     [onShowCallout]
   );
@@ -83,49 +91,198 @@ const ArrayItem = React.memo(({ value, onBlur, onChange, onShowCallout }: ArrayI
 
 type StringArrayEditorProps = {
   items: string[];
+  selectedKey: string;
+  lgTemplates?: readonly LgTemplate[];
+  memoryVariables?: readonly string[];
+  lgOption?: LGOption;
   onChange: (items: string[]) => void;
-  onShowCallout: (target: HTMLElement) => void;
 };
 
-const StringArrayEditor = React.memo(({ items, onChange, onShowCallout }: StringArrayEditorProps) => {
-  const [addButtonVisible, setAddButtonVisible] = useState(true);
+const StringArrayEditor = React.memo(
+  ({ items, lgTemplates, memoryVariables, selectedKey, onChange }: StringArrayEditorProps) => {
+    const containerRef = useRef<HTMLDivElement | null>(null);
+    const [addButtonVisible, setAddButtonVisible] = useState(true);
+    const [currentIndex, setCurrentIndex] = useState<number | null>(null);
+    const [calloutTargetElement, setCalloutTargetElement] = useState<HTMLInputElement | null>(null);
 
-  const handleChange = useCallback(
-    (index: number) => (_, newValue?: string) => {
-      const updatedItems = [...items];
-      updatedItems[index] = newValue ?? '';
-      onChange(updatedItems);
-    },
-    [items, onChange]
-  );
+    const handleChange = useCallback(
+      (index: number) => (_, newValue?: string) => {
+        const updatedItems = [...items];
+        updatedItems[index] = newValue ?? '';
+        onChange(updatedItems);
+      },
+      [items, onChange]
+    );
 
-  const handleBlur = useCallback(() => {
-    setAddButtonVisible(true);
-  }, [items, onChange]);
+    const handleBlur = useCallback(() => {
+      setAddButtonVisible(true);
+    }, [items, onChange]);
 
-  const handleClickAddVariation = useCallback(() => {
-    onChange([...items, '']);
-    setAddButtonVisible(false);
-  }, [items, onChange]);
+    const handleFocus = useCallback(
+      (index: number) => () => {
+        setCurrentIndex(index);
+      },
+      [setCurrentIndex]
+    );
 
-  return (
-    <React.Fragment>
-      {items.map((value, key) => (
-        <ArrayItem
-          key={key}
-          value={value}
-          onBlur={handleBlur}
-          onChange={handleChange(key)}
-          onShowCallout={onShowCallout}
-        />
-      ))}
-      {addButtonVisible && (
-        <Link as="button" styles={styles.link} onClick={handleClickAddVariation}>
-          {formatMessage('Add new variation')}
-        </Link>
-      )}
-    </React.Fragment>
-  );
-});
+    const handleClickAddVariation = useCallback(() => {
+      onChange([...items, '']);
+      setAddButtonVisible(false);
+    }, [items, onChange]);
+
+    const handleShowCallout = useCallback((targetElement: HTMLInputElement) => {
+      setCalloutTargetElement(targetElement);
+    }, []);
+
+    useEffect(() => {
+      const keydownHandler = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          setCalloutTargetElement(null);
+          setCurrentIndex(null);
+        }
+      };
+
+      const focusHandler = (e: FocusEvent) => {
+        if (containerRef.current?.contains(e.target as Node)) {
+          return;
+        }
+
+        if (
+          !e
+            .composedPath()
+            .filter((n) => n instanceof Element)
+            .map((n) => (n as Element).className)
+            .some((c) => c.indexOf(jsLgToolbarMenuClassName) !== -1)
+        ) {
+          setCalloutTargetElement(null);
+          setCurrentIndex(null);
+        }
+      };
+
+      document.addEventListener('keydown', keydownHandler);
+      document.addEventListener('focusin', focusHandler);
+
+      return () => {
+        document.removeEventListener('keydown', keydownHandler);
+        document.removeEventListener('focusin', focusHandler);
+      };
+    }, []);
+
+    const selectToolbarMenuItem = React.useCallback(
+      (insertText: string) => {
+        if (typeof currentIndex === 'number' && currentIndex < items.length) {
+          const updatedItems = [...items];
+
+          if (typeof calloutTargetElement?.selectionStart === 'number') {
+            const item = updatedItems[currentIndex];
+            const start = calloutTargetElement.selectionStart;
+            const end =
+              typeof calloutTargetElement?.selectionEnd === 'number'
+                ? calloutTargetElement.selectionEnd
+                : calloutTargetElement.selectionStart;
+            updatedItems[currentIndex] = [item.slice(0, start), insertText, item.slice(end)].join('');
+            onChange(updatedItems);
+
+            setTimeout(() => {
+              calloutTargetElement.setSelectionRange(
+                updatedItems[currentIndex].length,
+                updatedItems[currentIndex].length
+              );
+            }, 0);
+          }
+
+          calloutTargetElement?.focus();
+        }
+      },
+      [calloutTargetElement, currentIndex, items, onChange]
+    );
+
+    const insertSSMLTag = React.useCallback(
+      (ssmlTagType: SSMLTagType) => {
+        if (typeof currentIndex === 'number' && currentIndex < items.length) {
+          const updatedItems = [...items];
+
+          if (
+            typeof calloutTargetElement?.selectionStart === 'number' &&
+            typeof calloutTargetElement?.selectionEnd === 'number'
+          ) {
+            const item = updatedItems[currentIndex];
+            const start = calloutTargetElement.selectionStart;
+            const end = calloutTargetElement.selectionEnd;
+            updatedItems[currentIndex] = [
+              item.slice(0, start),
+              `<${ssmlTagType}>`,
+              item.slice(start, end),
+              `</${ssmlTagType}>`,
+              item.slice(end),
+            ].join('');
+            onChange(updatedItems);
+
+            setTimeout(() => {
+              calloutTargetElement.setSelectionRange(
+                updatedItems[currentIndex].length,
+                updatedItems[currentIndex].length
+              );
+            }, 0);
+          }
+
+          calloutTargetElement?.focus();
+        }
+      },
+      [calloutTargetElement, currentIndex, items, onChange]
+    );
+
+    const toolbar = React.useMemo(
+      () =>
+        selectedKey === 'speak' ? (
+          <LgSpeakModalityToolbar
+            key="lg-speak-toolbar"
+            lgTemplates={lgTemplates}
+            properties={memoryVariables}
+            onInsertSSMLTag={insertSSMLTag}
+            onSelectToolbarMenuItem={selectToolbarMenuItem}
+          />
+        ) : (
+          <LgEditorToolbar
+            key="lg-toolbar"
+            lgTemplates={lgTemplates}
+            properties={memoryVariables}
+            onSelectToolbarMenuItem={selectToolbarMenuItem}
+          />
+        ),
+      [selectedKey, lgTemplates, memoryVariables, insertSSMLTag, selectToolbarMenuItem]
+    );
+
+    return (
+      <div ref={containerRef}>
+        {items.map((value, key) => (
+          <ArrayItem
+            key={key}
+            value={value}
+            onBlur={handleBlur}
+            onChange={handleChange(key)}
+            onFocus={handleFocus(key)}
+            onShowCallout={handleShowCallout}
+          />
+        ))}
+        {addButtonVisible && (
+          <Link as="button" styles={styles.link} onClick={handleClickAddVariation}>
+            {formatMessage('Add new variation')}
+          </Link>
+        )}
+        {calloutTargetElement && (
+          <Callout
+            directionalHint={DirectionalHint.topLeftEdge}
+            gapSpace={2}
+            isBeakVisible={false}
+            target={calloutTargetElement}
+          >
+            {toolbar}
+          </Callout>
+        )}
+      </div>
+    );
+  }
+);
 
 export { StringArrayEditor };

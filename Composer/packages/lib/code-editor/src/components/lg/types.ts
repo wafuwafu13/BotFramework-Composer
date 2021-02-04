@@ -3,6 +3,8 @@
 
 import { LgTemplate } from '@botframework-composer/types';
 
+import { LGOption } from '../../utils';
+
 export type TemplateRefPayload = {
   kind: 'templateRef';
   data: { templates: readonly LgTemplate[]; onSelectTemplate: (templateString: string) => void };
@@ -39,3 +41,13 @@ export type LgLanguageContext =
 
 export const modalityTypes = ['text', 'speak', 'attachments', 'suggestedActions'] as const;
 export type ModalityType = typeof modalityTypes[number];
+
+export type CommonModalityEditorProps = {
+  removeModalityDisabled: boolean;
+  template?: LgTemplate;
+  lgOption?: LGOption;
+  lgTemplates?: readonly LgTemplate[];
+  memoryVariables?: readonly string[];
+  onModalityChange: (body: string) => void;
+  onRemoveModality: () => void;
+};

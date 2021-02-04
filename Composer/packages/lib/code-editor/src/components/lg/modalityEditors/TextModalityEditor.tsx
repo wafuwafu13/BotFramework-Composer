@@ -6,14 +6,16 @@ import React, { useCallback, useState } from 'react';
 
 import { ModalityEditorContainer } from './ModalityEditorContainer';
 import { StringArrayEditor } from './StringArrayEditor';
-import { CommonModalityEditorProps } from './types';
+import { CommonModalityEditorProps } from '../types';
 
 const TextModalityEditor = React.memo(
   ({
     removeModalityDisabled: disableRemoveModality,
     template,
+    lgOption,
+    lgTemplates,
+    memoryVariables,
     onModalityChange,
-    onShowCallout,
     onRemoveModality,
   }: CommonModalityEditorProps) => {
     const [items, setItems] = useState<string[]>(template?.body?.replace(/- /g, '').split('\n') || []);
@@ -37,7 +39,14 @@ const TextModalityEditor = React.memo(
         modalityType="text"
         onRemoveModality={onRemoveModality}
       >
-        <StringArrayEditor items={items} onChange={handleChange} onShowCallout={onShowCallout} />
+        <StringArrayEditor
+          items={items}
+          lgOption={lgOption}
+          lgTemplates={lgTemplates}
+          memoryVariables={memoryVariables}
+          selectedKey="text"
+          onChange={handleChange}
+        />
       </ModalityEditorContainer>
     );
   }
