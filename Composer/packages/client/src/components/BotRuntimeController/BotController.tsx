@@ -333,7 +333,7 @@ const BotController: React.FC = () => {
       <Panel
         isHiddenOnDismiss
         closeButtonAriaLabel={formatMessage('Close')}
-        customWidth={'390px'}
+        customWidth={'395px'}
         headerText={projectName}
         isBlocking={false}
         isOpen={isOpen}

@@ -68,7 +68,7 @@ export const WebChatPanel: React.FC<WebChatPanelProps> = ({ botUrl, secrets, dir
 
   async function fetchDLEssentials() {
     const resp: any = await conversationService.startConversation({
-      botUrl: botUrl || 'http://localhost:3978/api/messages',
+      botUrl,
       channelServiceType: 'public',
       members: [user],
       mode: 'conversation',
@@ -85,8 +85,10 @@ export const WebChatPanel: React.FC<WebChatPanelProps> = ({ botUrl, secrets, dir
   }
 
   useEffect(() => {
-    fetchDLEssentials();
-  }, []);
+    if (botUrl) {
+      fetchDLEssentials();
+    }
+  }, [botUrl]);
 
   const webchatContent = useMemo(() => {
     if (directlineObj?.conversationId) {
