@@ -165,7 +165,7 @@ export const LgCodeEditor = (props: LgCodeEditorProps) => {
   }, [onNavigateToLgPage, lgOption?.fileId]);
 
   return (
-    <Stack>
+    <Stack verticalFill>
       {!toolbarHidden && (
         <LgEditorToolbar
           lgTemplates={lgTemplates}
