@@ -6,7 +6,7 @@ import { ITooltipHostProps, TooltipHost } from 'office-ui-fabric-react/lib/Toolt
 
 type Props = ITooltipHostProps;
 
-export const withTooltip = <P,>(tooltipProps: Props, Component: React.FC<P>) => (props: P) => (
+export const withTooltip = <P,>(tooltipProps: Props, Component: React.FC<P> | React.ComponentType<P>) => (props: P) => (
   <TooltipHost {...tooltipProps}>
     <Component {...props} />
   </TooltipHost>
