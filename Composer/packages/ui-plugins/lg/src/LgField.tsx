@@ -148,7 +148,7 @@ const LgField: React.FC<FieldProps<string>> = (props) => {
   );
 
   const handleModalityChange = React.useCallback(
-    async (modality: string, body: string) => {
+    async (modality: string, body?: string) => {
       if (designerId) {
         if (body) {
           await shellApi.debouncedUpdateLgTemplate(lgFileId, `${lgName}_${modality}`, body);

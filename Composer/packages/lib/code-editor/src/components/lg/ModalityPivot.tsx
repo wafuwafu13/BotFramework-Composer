@@ -62,6 +62,7 @@ const renderModalityEditor = (
   modality: ModalityType,
   onRemoveModality: (modality: ModalityType) => () => void,
   onModalityChange: (modality: ModalityType, body: string) => void,
+  onInputHintChange: (inputHintString) => void,
   modalityTemplates: Record<ModalityType, LgTemplate>,
   disableRemoveModality: boolean,
   lgOption?: LGOption,
@@ -85,6 +86,7 @@ const renderModalityEditor = (
           lgTemplates={lgTemplates}
           memoryVariables={memoryVariables}
           template={modalityTemplates.speak}
+          onInputHintChange={onInputHintChange}
           onModalityChange={(body: string) => onModalityChange('speak', body)}
           onRemoveModality={onRemoveModality('speak')}
         />
@@ -208,6 +210,7 @@ const ModalityPivot = React.memo((props: LgResponseEditorProps) => {
         const updatedModalities = modalities.filter((item) => item !== modality);
         setModalities(updatedModalities);
         setSelectedKey(updatedModalities[0]);
+        onModalityChange(modality);
       }
     },
     [modalities, setModalities, setSelectedKey]
@@ -228,6 +231,8 @@ const ModalityPivot = React.memo((props: LgResponseEditorProps) => {
       setSelectedKey(item?.props.itemKey as ModalityType);
     }
   }, []);
+
+  const handleInputHintChange = useCallback((inputHint: string) => {}, []);
 
   const addMenuProps = React.useMemo<IContextualMenuProps>(
     () => ({
@@ -255,6 +260,7 @@ const ModalityPivot = React.memo((props: LgResponseEditorProps) => {
           selectedKey,
           handleRemoveModality,
           onModalityChange,
+          handleInputHintChange,
           modalityTemplates,
           modalities.length === 1,
           lgOption,

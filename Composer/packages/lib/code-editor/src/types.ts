@@ -13,7 +13,7 @@ type LgCommonEditorProps = {
   lgTemplates?: readonly LgTemplate[];
   memoryVariables?: readonly string[];
   lgOption?: LGOption;
-  onModalityChange?: (modality: string, body: string) => void;
+  onModalityChange?: (modality: string, body?: string) => void;
 };
 
 /**

@@ -153,5 +153,5 @@ export const LgEditorToolbar = React.memo((props: LgEditorToolbarProps) => {
     [fixedItems, moreItems]
   );
 
-  return <CommandBar className={className} items={items} styles={commandBarStyles} />;
+  return <CommandBar className={className} items={items} styles={commandBarStyles} onReduceData={() => undefined} />;
 });
