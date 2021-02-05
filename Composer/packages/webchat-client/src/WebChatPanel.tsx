@@ -2,10 +2,11 @@
 // Licensed under the MIT License.
 
 import React, { useMemo, useEffect, useState, useRef } from 'react';
-import ReactWebChat from 'botframework-webchat';
+import ReactWebChat, { createStyleSet } from 'botframework-webchat';
 import formatMessage from 'format-message';
 import { createStore as createWebChatStore } from 'botframework-webchat-core';
 
+import webChatStyleOptions from './utils/webChatTheme';
 import { ConversationService } from './utils/ConversationService';
 import { WebChatHeader } from './WebChatHeader';
 
@@ -88,7 +89,7 @@ export const WebChatPanel: React.FC<WebChatPanelProps> = ({ botUrl, secrets, dir
     if (botUrl) {
       fetchDLEssentials();
     }
-  }, [botUrl]);
+  }, [botUrl, secrets]);
 
   const webchatContent = useMemo(() => {
     if (directlineObj?.conversationId) {
@@ -100,14 +101,15 @@ export const WebChatPanel: React.FC<WebChatPanelProps> = ({ botUrl, secrets, dir
         user,
       });
       const webchatStore = createWebChatStore({});
+      const styleSet = createStyleSet({ ...webChatStyleOptions });
+
       return (
         <ReactWebChat
           key={directlineObj.conversationId}
           directLine={directlineObj}
           disabled={!botUrl}
           store={webchatStore}
-          // reference: https://github.com/microsoft/BotFramework-WebChat/blob/master/packages/component/src/Styles/defaultStyleOptions.js
-          styleOptions={{}}
+          styleSet={styleSet}
           userID={conversationService.getUser().id}
         />
       );
