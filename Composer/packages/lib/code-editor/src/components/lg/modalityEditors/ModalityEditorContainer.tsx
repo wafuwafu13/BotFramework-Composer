@@ -5,13 +5,14 @@ import styled from '@emotion/styled';
 import { FluentTheme } from '@uifabric/fluent-theme';
 import { NeutralColors } from '@uifabric/fluent-theme/lib/fluent/FluentColors';
 import formatMessage from 'format-message';
-import { CommandBarButton } from 'office-ui-fabric-react/lib/Button';
+import { CommandBarButton, DefaultButton, PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
+import { Dialog, DialogFooter, DialogType } from 'office-ui-fabric-react/lib/Dialog';
 import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 import { OverflowSet } from 'office-ui-fabric-react/lib/OverflowSet';
 import { Stack } from 'office-ui-fabric-react/lib/Stack';
 import { Text } from 'office-ui-fabric-react/lib/Text';
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import { ModalityType } from '../types';
 
@@ -72,21 +73,28 @@ const ModalityEditorContainer: React.FC<Props> = ({
   dropdownOptions,
   menuItems = [],
   removeModalityOptionText,
+  modalityTitle,
   contentTitle,
   onDropdownChange,
   onRemoveModality,
 }) => {
-  const overflowMenuItems: IContextualMenuItem[] = useMemo(
+  const [showDialog, setShowDialog] = React.useState(false);
+
+  const handleToggleShowDialog = React.useCallback(() => {
+    setShowDialog((current) => !current);
+  }, [setShowDialog]);
+
+  const overflowMenuItems: IContextualMenuItem[] = React.useMemo(
     () => [
       ...menuItems,
       {
         key: 'remove',
         disabled: disableRemoveModality,
         text: removeModalityOptionText,
-        onClick: () => onRemoveModality(),
+        onClick: () => handleToggleShowDialog(),
       },
     ],
-    [menuItems, removeModalityOptionText]
+    [menuItems, handleToggleShowDialog]
   );
 
   const renderTitle = React.useCallback(
@@ -128,6 +136,27 @@ const ModalityEditorContainer: React.FC<Props> = ({
         </Stack>
       </HeaderContainer>
       {children}
+      <Dialog
+        hidden={!showDialog}
+        onDismiss={handleToggleShowDialog}
+        dialogContentProps={{
+          type: DialogType.normal,
+          title: formatMessage('Removing a modality from this action node'),
+          closeButtonAriaLabel: formatMessage('Close'),
+          subText: formatMessage(
+            'You are about to remove {modalityTitle} modality from this action node. The content in the tab will be lost. Do you want to continue?',
+            { modalityTitle }
+          ),
+        }}
+        modalProps={{
+          isBlocking: true,
+        }}
+      >
+        <DialogFooter>
+          <PrimaryButton onClick={() => onRemoveModality()} text={formatMessage('Confirm')} />
+          <DefaultButton onClick={handleToggleShowDialog} text={formatMessage('Cancel')} />
+        </DialogFooter>
+      </Dialog>
     </Root>
   );
 };
