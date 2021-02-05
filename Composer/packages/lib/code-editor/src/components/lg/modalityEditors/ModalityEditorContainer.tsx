@@ -78,6 +78,7 @@ const ModalityEditorContainer: React.FC<Props> = ({
   onDropdownChange,
   onRemoveModality,
 }) => {
+  const renderConfirmDialogContent = React.useCallback((text: string) => <Text>{text}</Text>, []);
   const overflowMenuItems: IContextualMenuItem[] = React.useMemo(
     () => [
       ...menuItems,
@@ -86,18 +87,22 @@ const ModalityEditorContainer: React.FC<Props> = ({
         disabled: disableRemoveModality,
         text: removeModalityOptionText,
         onClick: () => {
-          OpenConfirmModal(
-            formatMessage('Removing a modality from this action node'),
-            formatMessage(
-              'You are about to remove {modalityTitle} modality from this action node. The content in the tab will be lost. Do you want to continue?',
-              { modalityTitle }
-            ),
-            {
-              confirmText: formatMessage('Confirm'),
+          (async () => {
+            const confirm = await OpenConfirmModal(
+              formatMessage('Removing a modality from this action node'),
+              formatMessage(
+                'You are about to remove {modalityTitle} modality from this action node. The content in the tab will be lost. Do you want to continue?',
+                { modalityTitle }
+              ),
+              {
+                confirmText: formatMessage('Confirm'),
+                onRenderContent: renderConfirmDialogContent,
+              }
+            );
+            if (confirm) {
+              onRemoveModality();
             }
-          ).then((result) => {
-            result && onRemoveModality();
-          });
+          })();
         },
       },
     ],
