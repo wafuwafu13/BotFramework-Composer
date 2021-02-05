@@ -94,7 +94,11 @@ const renderModalityEditor = (
     case 'suggestedActions':
       return (
         <SuggestedActionsModalityEditor
+          lgOption={lgOption}
+          lgTemplates={lgTemplates}
+          memoryVariables={memoryVariables}
           removeModalityDisabled={disableRemoveModality}
+          template={modalityTemplates.suggestedActions}
           onModalityChange={(body: string) => onModalityChange('suggestedActions', body)}
           onRemoveModality={onRemoveModality('suggestedActions')}
         />
