@@ -2,12 +2,13 @@
 // Licensed under the MIT License.
 
 import formatMessage from 'format-message';
-import React, { useCallback, useState } from 'react';
 import { IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
+import React, { useCallback, useState } from 'react';
+
+import { CommonModalityEditorProps } from '../types';
 
 import { ModalityEditorContainer } from './ModalityEditorContainer';
 import { StringArrayEditor } from './StringArrayEditor';
-import { CommonModalityEditorProps } from '../types';
 
 const SpeechModalityEditor = React.memo(
   ({
@@ -33,21 +34,16 @@ const SpeechModalityEditor = React.memo(
     const inputHintOptions = React.useMemo<IDropdownOption[]>(
       () => [
         {
-          key: 'undefined',
-          text: formatMessage('Input hint: undefined'),
-          selected: true,
-        },
-        {
           key: 'acceptingInput',
-          text: formatMessage('Input hint: Accepting'),
+          text: formatMessage('Accepting'),
         },
         {
           key: 'ignoringInput',
-          text: formatMessage('Input hint: Ignoring'),
+          text: formatMessage('Ignoring'),
         },
         {
           key: 'expectingInput',
-          text: formatMessage('Input hint: Expecting'),
+          text: formatMessage('Expecting'),
         },
       ],
       []

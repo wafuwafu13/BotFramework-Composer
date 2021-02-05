@@ -2,13 +2,15 @@
 // Licensed under the MIT License.
 
 import styled from '@emotion/styled';
-import { NeutralColors, SharedColors } from '@uifabric/fluent-theme/lib/fluent/FluentColors';
+import { FluentTheme } from '@uifabric/fluent-theme';
+import { NeutralColors } from '@uifabric/fluent-theme/lib/fluent/FluentColors';
 import formatMessage from 'format-message';
 import { CommandBarButton } from 'office-ui-fabric-react/lib/Button';
-import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
+import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 import { OverflowSet } from 'office-ui-fabric-react/lib/OverflowSet';
 import { Stack } from 'office-ui-fabric-react/lib/Stack';
+import { Text } from 'office-ui-fabric-react/lib/Text';
 import React, { useMemo } from 'react';
 
 import { ModalityType } from '../types';
@@ -27,14 +29,12 @@ const HeaderContainer = styled.div({
 
 const styles = {
   dropdown: {
-    caretDown: { color: SharedColors.cyanBlue10 },
-    caretDownWrapper: { height: '20px', lineHeight: '20px' },
-    root: { flexBasis: 'auto', paddingBottom: '-4px' },
+    caretDown: { fontSize: FluentTheme.fonts.xSmall.fontSize, color: FluentTheme.palette.accent },
+    dropdownOptionText: { ...FluentTheme.fonts.small },
     title: {
       border: 'none',
-      color: SharedColors.cyanBlue10,
-      height: '20px',
-      lineHeight: '20px',
+      ...FluentTheme.fonts.small,
+      color: FluentTheme.palette.accent,
     },
   },
 };
@@ -43,7 +43,7 @@ const onRenderOverflowButton = (overflowItems?: IContextualMenuItem[]): JSX.Elem
   return (
     <CommandBarButton
       menuIconProps={{ iconName: 'MoreVertical' }}
-      menuProps={{ items: overflowItems! }}
+      menuProps={overflowItems && { items: overflowItems }}
       role="menuitem"
       styles={{ root: { padding: '4px 0 4px 0' } }}
       title={formatMessage('Options')}
@@ -88,6 +88,16 @@ const ModalityEditorContainer: React.FC<Props> = ({
     [menuItems]
   );
 
+  const renderTitle = React.useCallback(
+    (optionProps?: IDropdownOption[], defaultRender?: (optionProps?: IDropdownOption[]) => JSX.Element | null) => (
+      <Text variant="small">
+        {formatMessage('Input hint: ')}
+        {defaultRender?.(optionProps)}
+      </Text>
+    ),
+    []
+  );
+
   return (
     <Root>
       <HeaderContainer>
@@ -99,7 +109,13 @@ const ModalityEditorContainer: React.FC<Props> = ({
           />
           <Stack horizontal verticalAlign="center">
             {dropdownOptions && onDropdownChange && (
-              <Dropdown options={dropdownOptions} styles={styles.dropdown} onChange={onDropdownChange} />
+              <Dropdown
+                options={dropdownOptions}
+                placeholder={formatMessage('Select input hint')}
+                styles={styles.dropdown}
+                onChange={onDropdownChange}
+                onRenderTitle={renderTitle}
+              />
             )}
             <OverflowSet
               items={[]}

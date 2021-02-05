@@ -6,11 +6,11 @@ import { FluentTheme, FontSizes } from '@uifabric/fluent-theme';
 import formatMessage from 'format-message';
 import { IconButton } from 'office-ui-fabric-react/lib/Button';
 import {
-  IContextualMenuProps,
   ContextualMenuItemType,
   IContextualMenuItem,
   IContextualMenuItemProps,
   IContextualMenuItemRenderFunctions,
+  IContextualMenuProps,
 } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { Link } from 'office-ui-fabric-react/lib/Link';
 import { IPivotStyles, Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
@@ -81,10 +81,10 @@ const renderModalityEditor = (
     case 'speak':
       return (
         <SpeechModalityEditor
-          removeModalityDisabled={disableRemoveModality}
           lgOption={lgOption}
           lgTemplates={lgTemplates}
           memoryVariables={memoryVariables}
+          removeModalityDisabled={disableRemoveModality}
           template={modalityTemplates.speak}
           onInputHintChange={onInputHintChange}
           onModalityChange={(body: string) => onModalityChange('speak', body)}
@@ -102,10 +102,10 @@ const renderModalityEditor = (
     case 'text':
       return (
         <TextModalityEditor
-          removeModalityDisabled={disableRemoveModality}
           lgOption={lgOption}
           lgTemplates={lgTemplates}
           memoryVariables={memoryVariables}
+          removeModalityDisabled={disableRemoveModality}
           template={modalityTemplates.text}
           onModalityChange={(body: string) => onModalityChange('text', body)}
           onRemoveModality={onRemoveModality('text')}

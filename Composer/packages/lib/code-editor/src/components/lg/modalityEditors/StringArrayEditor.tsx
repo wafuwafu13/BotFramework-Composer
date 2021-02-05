@@ -1,26 +1,29 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import React, { useEffect, useCallback, useRef, useState } from 'react';
-import styled from '@emotion/styled';
-import { Callout, DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
-import { Link, ILinkStyles } from 'office-ui-fabric-react/lib/Link';
-import { NeutralColors } from '@uifabric/fluent-theme/lib/fluent/FluentColors';
-import { TextField, ITextField, ITextFieldStyles } from 'office-ui-fabric-react/lib/TextField';
-import formatMessage from 'format-message';
-import { FluentTheme } from '@uifabric/fluent-theme';
 import { LgTemplate } from '@bfc/shared';
+import styled from '@emotion/styled';
+import { FluentTheme } from '@uifabric/fluent-theme';
+import { NeutralColors } from '@uifabric/fluent-theme/lib/fluent/FluentColors';
+import formatMessage from 'format-message';
+import { Callout, DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
+import { ILinkStyles, Link } from 'office-ui-fabric-react/lib/Link';
+import { ITextField, ITextFieldStyles, TextField } from 'office-ui-fabric-react/lib/TextField';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
+import { LGOption } from '../../../utils';
+import { jsLgToolbarMenuClassName } from '../constants';
 import { LgEditorToolbar } from '../LgEditorToolbar';
 import { LgSpeakModalityToolbar, SSMLTagType } from '../LgSpeakModalityToolbar';
-import { jsLgToolbarMenuClassName } from '../constants';
-import { LGOption } from '../../../utils';
 
 const Item = styled(TextField)(({ focused }: { focused: boolean }) => ({
   borderBottom: `1px solid ${NeutralColors.gray30}`,
   padding: '8px 0 8px 4px',
   width: '100%',
   position: 'relative',
+  '& input': {
+    fontSize: FluentTheme.fonts.small.fontSize,
+  },
   '& .ms-TextField-fieldGroup::after': focused
     ? {
         content: '""',
@@ -62,7 +65,7 @@ type ArrayItemProps = {
   focused: boolean;
   value: string;
   onBlur: () => void;
-  onChange: (event, value?: string) => void;
+  onChange: (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => void;
   onFocus: () => void;
   onShowCallout: (target) => void;
 };
