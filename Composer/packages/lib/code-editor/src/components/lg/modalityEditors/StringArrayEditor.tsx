@@ -9,17 +9,33 @@ import { NeutralColors } from '@uifabric/fluent-theme/lib/fluent/FluentColors';
 import { TextField, ITextField, ITextFieldStyles } from 'office-ui-fabric-react/lib/TextField';
 import formatMessage from 'format-message';
 import { FluentTheme } from '@uifabric/fluent-theme';
+import { LgTemplate } from '@bfc/shared';
+
 import { LgEditorToolbar } from '../LgEditorToolbar';
 import { LgSpeakModalityToolbar, SSMLTagType } from '../LgSpeakModalityToolbar';
 import { jsLgToolbarMenuClassName } from '../constants';
-import { LgTemplate } from '@bfc/shared';
 import { LGOption } from '../../../utils';
 
-const Item = styled(TextField)({
+const Item = styled(TextField)(({ focused }: { focused: boolean }) => ({
   borderBottom: `1px solid ${NeutralColors.gray30}`,
   padding: '8px 0 8px 4px',
   width: '100%',
-});
+  position: 'relative',
+  '& .ms-TextField-fieldGroup::after': focused
+    ? {
+        content: '""',
+        position: 'absolute',
+        left: -1,
+        top: -1,
+        right: -1,
+        bottom: -1,
+        pointerEvents: 'none',
+        borderRadius: 2,
+        border: `2px solid ${FluentTheme.palette.themePrimary}`,
+        zIndex: 1,
+      }
+    : null,
+}));
 
 const styles: { link: ILinkStyles; textInput: Partial<ITextFieldStyles> } = {
   link: {
@@ -43,6 +59,7 @@ const styles: { link: ILinkStyles; textInput: Partial<ITextFieldStyles> } = {
 };
 
 type ArrayItemProps = {
+  focused: boolean;
   value: string;
   onBlur: () => void;
   onChange: (event, value?: string) => void;
@@ -50,7 +67,7 @@ type ArrayItemProps = {
   onShowCallout: (target) => void;
 };
 
-const ArrayItem = React.memo(({ value, onBlur, onChange, onFocus, onShowCallout }: ArrayItemProps) => {
+const ArrayItem = React.memo(({ focused, value, onBlur, onChange, onFocus, onShowCallout }: ArrayItemProps) => {
   const itemRef = useRef<ITextField | null>(null);
 
   useEffect(() => {
@@ -79,6 +96,7 @@ const ArrayItem = React.memo(({ value, onBlur, onChange, onFocus, onShowCallout 
   return (
     <Item
       componentRef={(ref) => (itemRef.current = ref)}
+      focused={focused}
       styles={styles.textInput}
       value={value}
       onBlur={onBlur}
@@ -258,6 +276,7 @@ const StringArrayEditor = React.memo(
         {items.map((value, key) => (
           <ArrayItem
             key={key}
+            focused={key === currentIndex}
             value={value}
             onBlur={handleBlur}
             onChange={handleChange(key)}
