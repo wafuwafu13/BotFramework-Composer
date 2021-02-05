@@ -7,16 +7,28 @@ import { LgEditor, LgEditorMode } from '@bfc/code-editor';
 import { FieldProps, useShellApi } from '@bfc/extension-client';
 import { filterTemplateDiagnostics } from '@bfc/indexers';
 import { CodeEditorSettings, LgMetaData, LgTemplateRef, LgType } from '@bfc/shared';
+import { OpenConfirmModal } from '@bfc/ui-shared';
 import { jsx } from '@emotion/core';
 import formatMessage from 'format-message';
 import { Link } from 'office-ui-fabric-react/lib/Link';
 import { Stack } from 'office-ui-fabric-react/lib/Stack';
+import { Text } from 'office-ui-fabric-react/lib/Text';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { locateLgTemplatePosition } from './locateLgTemplatePosition';
 
+const structuredResponseDocumentUrl =
+  'https://docs.microsoft.com/en-us/azure/bot-service/language-generation/language-generation-structured-response-template?view=azure-bot-service-4.0';
 const linkStyles = {
   root: { fontSize: 12, ':hover': { textDecoration: 'none' }, ':active': { textDecoration: 'none' } },
+};
+
+const confirmDialogContentStyles = {
+  root: { marginBottom: 16 },
+};
+
+const confirmDialogContentTokens = {
+  childrenGap: 16,
 };
 
 const lspServerPath = '/lg-language-server';
@@ -133,9 +145,41 @@ const LgField: React.FC<FieldProps<string>> = (props) => {
     shellApi.updateUserSettings({ codeEditor: settings });
   };
 
-  const modeChange = React.useCallback(() => {
-    setEditorMode(editorMode === 'codeEditor' ? 'responseEditor' : 'codeEditor');
-  }, [editorMode]);
+  // TODO: update this logic to decide if the LG template is eligible for response editor view.
+  const structuredResponse = true;
+
+  const renderConfirmDialogContent = React.useCallback(
+    (text: string) => (
+      <Stack styles={confirmDialogContentStyles} tokens={confirmDialogContentTokens}>
+        {text}
+      </Stack>
+    ),
+    []
+  );
+
+  const modeChange = React.useCallback(async () => {
+    let changeMode = true;
+    if (editorMode === 'codeEditor' && !structuredResponse) {
+      changeMode = await OpenConfirmModal(
+        formatMessage('Warning'),
+        formatMessage.rich(
+          '<text>To use Response editor, the LG template needs to be an activity response template. <a>Visit this document</a> to learn more.</text><text>If you proceed to switch to Response editor, you will lose your current template content, and start with a blank response. Do you want to continue?</text>',
+          {
+            a: ({ children }) => (
+              <Link href={structuredResponseDocumentUrl} target="_blank">
+                {children}
+              </Link>
+            ),
+            text: ({ children }) => <Text>{children}</Text>,
+          }
+        ),
+        { confirmText: formatMessage('Confirm'), onRenderContent: renderConfirmDialogContent }
+      );
+    }
+    if (changeMode) {
+      setEditorMode(editorMode === 'codeEditor' ? 'responseEditor' : 'codeEditor');
+    }
+  }, [editorMode, structuredResponse]);
 
   const navigateToLgPage = React.useCallback(
     (lgFileId: string) => {
