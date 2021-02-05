@@ -106,7 +106,7 @@ const ModalityEditorContainer: React.FC<Props> = ({
         },
       },
     ],
-    [menuItems, onRemoveModality]
+    [menuItems, disableRemoveModality, removeModalityOptionText, onRemoveModality]
   );
 
   const renderTitle = React.useCallback(
