@@ -65,11 +65,21 @@ const LgField: React.FC<FieldProps<string>> = (props) => {
 
   const [memoryVariables, setMemoryVariables] = useState<string[] | undefined>();
   useEffect(() => {
+    const abortController = new AbortController();
     (async () => {
-      const variables = await shellApi.getMemoryVariables(projectId);
-      setMemoryVariables(variables);
+      try {
+        const variables = await shellApi.getMemoryVariables(projectId, { signal: abortController.signal });
+        setMemoryVariables(variables);
+      } catch (e) {
+        // error can be due to abort
+      }
     })();
-  }, [projectId, shellApi]);
+
+    // clean up pending async request
+    () => {
+      abortController.abort();
+    };
+  }, [projectId]);
 
   const availableLgTemplates = React.useMemo(
     () =>

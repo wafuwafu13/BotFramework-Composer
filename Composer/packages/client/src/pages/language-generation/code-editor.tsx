@@ -88,12 +88,20 @@ const CodeEditor: React.FC<CodeEditorProps> = (props) => {
   };
 
   React.useEffect(() => {
+    const abortController = new AbortController();
     (async () => {
-      if (projectId) {
-        const variables = await getMemoryVariables(projectId);
+      try {
+        const variables = await getMemoryVariables(projectId, { signal: abortController.signal });
         setMemoryVariables(variables);
+      } catch (e) {
+        // error can be due to abort
       }
     })();
+
+    // clean up pending async request
+    () => {
+      abortController.abort();
+    };
   }, [projectId]);
 
   useEffect(() => {
