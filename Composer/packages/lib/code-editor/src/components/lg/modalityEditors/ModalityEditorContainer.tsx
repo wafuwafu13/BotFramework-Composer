@@ -59,6 +59,7 @@ type Props = {
   menuItems?: IContextualMenuItem[];
   modalityTitle: string;
   modalityType: ModalityType;
+  removeModalityOptionText: string;
   onRemoveModality: () => void;
   onDropdownChange?: (_: React.FormEvent<HTMLDivElement>, option?: IDropdownOption) => void;
 };
@@ -70,7 +71,7 @@ const ModalityEditorContainer: React.FC<Props> = ({
   disableRemoveModality,
   dropdownOptions,
   menuItems = [],
-  modalityTitle,
+  removeModalityOptionText,
   contentTitle,
   onDropdownChange,
   onRemoveModality,
@@ -81,11 +82,11 @@ const ModalityEditorContainer: React.FC<Props> = ({
       {
         key: 'remove',
         disabled: disableRemoveModality,
-        text: formatMessage('Remove {modality} modality', { modality: modalityTitle?.toLowerCase() }),
+        text: removeModalityOptionText,
         onClick: () => onRemoveModality(),
       },
     ],
-    [menuItems]
+    [menuItems, removeModalityOptionText]
   );
 
   const renderTitle = React.useCallback(

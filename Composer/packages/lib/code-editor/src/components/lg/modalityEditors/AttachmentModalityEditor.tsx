@@ -16,6 +16,7 @@ const AttachmentModalityEditor = React.memo(
         disableRemoveModality={disableRemoveModality}
         modalityTitle={formatMessage('Attachments')}
         modalityType="attachments"
+        removeModalityOptionText={formatMessage('Remove all attachments')}
         onRemoveModality={onRemoveModality}
       ></ModalityEditorContainer>
     );
