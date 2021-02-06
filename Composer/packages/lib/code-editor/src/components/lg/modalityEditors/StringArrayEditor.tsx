@@ -75,7 +75,8 @@ const StringArrayEditor = React.memo(
     const handleClickAddVariation = useCallback(() => {
       onChange([...items, '']);
       setAddButtonVisible(false);
-    }, [items, onChange]);
+      setCurrentIndex(items.length);
+    }, [items, setAddButtonVisible, setCurrentIndex, onChange]);
 
     const handleShowCallout = useCallback((targetElement: HTMLInputElement) => {
       setCalloutTargetElement(targetElement);
@@ -156,13 +157,24 @@ const StringArrayEditor = React.memo(
             const item = updatedItems[currentIndex];
             const start = calloutTargetElement.selectionStart;
             const end = calloutTargetElement.selectionEnd;
-            updatedItems[currentIndex] = [
-              item.slice(0, start),
-              `<${ssmlTagType}>`,
-              item.slice(start, end),
-              `</${ssmlTagType}>`,
-              item.slice(end),
-            ].join('');
+
+            if (ssmlTagType === 'break') {
+              const item = updatedItems[currentIndex];
+              const start = calloutTargetElement.selectionStart;
+              const end =
+                typeof calloutTargetElement?.selectionEnd === 'number'
+                  ? calloutTargetElement.selectionEnd
+                  : calloutTargetElement.selectionStart;
+              updatedItems[currentIndex] = [item.slice(0, start), `<${ssmlTagType} />`, item.slice(end)].join('');
+            } else {
+              updatedItems[currentIndex] = [
+                item.slice(0, start),
+                `<${ssmlTagType}>`,
+                item.slice(start, end),
+                `</${ssmlTagType}>`,
+                item.slice(end),
+              ].join('');
+            }
             onChange(updatedItems);
 
             setTimeout(() => {

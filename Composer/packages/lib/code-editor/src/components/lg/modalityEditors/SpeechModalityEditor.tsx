@@ -34,6 +34,11 @@ const SpeechModalityEditor = React.memo(
     const inputHintOptions = React.useMemo<IDropdownOption[]>(
       () => [
         {
+          key: 'none',
+          text: formatMessage('None'),
+          selected: true,
+        },
+        {
           key: 'acceptingInput',
           text: formatMessage('Accepting'),
         },

@@ -24,7 +24,7 @@ export const useLgEditorToolbarItems = (
   const propertyRefPayload = React.useMemo(
     () =>
       ({ kind: 'propertyRef', data: { properties, onSelectProperty: selectToolbarMenuItem } } as PropertyRefPayload),
-    [properties]
+    [properties, selectToolbarMenuItem]
   );
 
   const functionRefPayload = React.useMemo(
