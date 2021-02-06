@@ -149,7 +149,7 @@ const LgField: React.FC<FieldProps<string>> = (props) => {
   const structuredResponse = true;
 
   const renderConfirmDialogContent = React.useCallback(
-    (text: string) => (
+    (text: React.ReactNode) => (
       <Stack styles={confirmDialogContentStyles} tokens={confirmDialogContentTokens}>
         {text}
       </Stack>
@@ -162,17 +162,25 @@ const LgField: React.FC<FieldProps<string>> = (props) => {
     if (editorMode === 'codeEditor' && !structuredResponse) {
       changeMode = await OpenConfirmModal(
         formatMessage('Warning'),
-        formatMessage.rich(
-          '<text>To use Response editor, the LG template needs to be an activity response template. <a>Visit this document</a> to learn more.</text><text>If you proceed to switch to Response editor, you will lose your current template content, and start with a blank response. Do you want to continue?</text>',
-          {
-            a: ({ children }) => (
-              <Link href={structuredResponseDocumentUrl} target="_blank">
-                {children}
-              </Link>
-            ),
-            text: ({ children }) => <Text>{children}</Text>,
-          }
-        ),
+        <React.Fragment>
+          {formatMessage.rich(
+            '<text>To use Response editor, the LG template needs to be an activity response template. <a>Visit this document</a> to learn more.</text>',
+            {
+              a: ({ children }) => (
+                <Link key="help_document_url" href={structuredResponseDocumentUrl} target="_blank">
+                  {children}
+                </Link>
+              ),
+              text: ({ children }) => <Text key="confirm_message_0">{children}</Text>,
+            }
+          )}
+          {formatMessage.rich(
+            '<text>If you proceed to switch to Response editor, you will lose your current template content, and start with a blank response. Do you want to continue?</text>',
+            {
+              text: ({ children }) => <Text key="confirm_message_1">{children}</Text>,
+            }
+          )}
+        </React.Fragment>,
         { confirmText: formatMessage('Confirm'), onRenderContent: renderConfirmDialogContent }
       );
     }

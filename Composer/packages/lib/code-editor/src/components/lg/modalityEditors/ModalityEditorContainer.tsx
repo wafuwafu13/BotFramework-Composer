@@ -78,7 +78,7 @@ const ModalityEditorContainer: React.FC<Props> = ({
   onDropdownChange,
   onRemoveModality,
 }) => {
-  const renderConfirmDialogContent = React.useCallback((text: string) => <Text>{text}</Text>, []);
+  const renderConfirmDialogContent = React.useCallback((text: React.ReactNode) => <Text>{text}</Text>, []);
   const overflowMenuItems: IContextualMenuItem[] = React.useMemo(
     () => [
       ...menuItems,
