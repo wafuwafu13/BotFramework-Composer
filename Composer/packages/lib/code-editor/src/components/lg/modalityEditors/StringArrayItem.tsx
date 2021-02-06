@@ -74,7 +74,6 @@ type Props = {
   mode: 'edit' | 'view';
   value: string;
   onRemove: () => void;
-  onBlur: () => void;
   onFocus: () => void;
   onChange: (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => void;
   onShowCallout: (target: HTMLInputElement) => void;
@@ -122,7 +121,7 @@ const TextViewItem = React.memo(({ value, onRemove, onFocus }: TextViewItemProps
 
 type TextFieldItemProps = Omit<Props, 'onRemove' | 'mode' | 'onFocus'>;
 
-const TextFieldItem = React.memo(({ onBlur, value, onShowCallout, onChange }: TextFieldItemProps) => {
+const TextFieldItem = React.memo(({ value, onShowCallout, onChange }: TextFieldItemProps) => {
   const itemRef = useRef<ITextField | null>(null);
 
   useEffect(() => {
@@ -150,7 +149,6 @@ const TextFieldItem = React.memo(({ onBlur, value, onShowCallout, onChange }: Te
       componentRef={(ref) => (itemRef.current = ref)}
       styles={textFieldStyles}
       value={value}
-      onBlur={onBlur}
       onChange={onChange}
       onClick={handleClick}
       onFocus={handleFocus}
@@ -159,11 +157,11 @@ const TextFieldItem = React.memo(({ onBlur, value, onShowCallout, onChange }: Te
 });
 
 export const StringArrayItem = (props: Props) => {
-  const { mode, onBlur, onChange, onShowCallout, onRemove, onFocus, value } = props;
+  const { mode, onChange, onShowCallout, onRemove, onFocus, value } = props;
   return (
     <Root verticalAlign="center">
       {mode === 'edit' ? (
-        <TextFieldItem value={value} onBlur={onBlur} onChange={onChange} onShowCallout={onShowCallout} />
+        <TextFieldItem value={value} onChange={onChange} onShowCallout={onShowCallout} />
       ) : (
         <TextViewItem value={value} onFocus={onFocus} onRemove={onRemove} />
       )}

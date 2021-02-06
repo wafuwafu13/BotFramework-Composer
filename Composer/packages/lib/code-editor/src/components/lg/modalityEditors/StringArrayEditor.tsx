@@ -15,6 +15,8 @@ import { LgSpeakModalityToolbar, SSMLTagType } from '../LgSpeakModalityToolbar';
 
 import { StringArrayItem } from './StringArrayItem';
 
+const submitKeys = ['Enter', 'Esc'];
+
 const styles: { link: ILinkStyles } = {
   link: {
     root: {
@@ -39,7 +41,6 @@ type StringArrayEditorProps = {
 const StringArrayEditor = React.memo(
   ({ items, lgTemplates, memoryVariables, selectedKey, onChange }: StringArrayEditorProps) => {
     const containerRef = useRef<HTMLDivElement | null>(null);
-    const [addButtonVisible, setAddButtonVisible] = useState(true);
     const [currentIndex, setCurrentIndex] = useState<number | null>(null);
     const [calloutTargetElement, setCalloutTargetElement] = useState<HTMLInputElement | null>(null);
 
@@ -51,10 +52,6 @@ const StringArrayEditor = React.memo(
       },
       [items, onChange]
     );
-
-    const handleBlur = useCallback(() => {
-      setAddButtonVisible(true);
-    }, []);
 
     const handleFocus = useCallback(
       (index: number) => () => {
@@ -74,9 +71,8 @@ const StringArrayEditor = React.memo(
 
     const handleClickAddVariation = useCallback(() => {
       onChange([...items, '']);
-      setAddButtonVisible(false);
       setCurrentIndex(items.length);
-    }, [items, setAddButtonVisible, setCurrentIndex, onChange]);
+    }, [items, setCurrentIndex, onChange]);
 
     const handleShowCallout = useCallback((targetElement: HTMLInputElement) => {
       setCalloutTargetElement(targetElement);
@@ -84,7 +80,7 @@ const StringArrayEditor = React.memo(
 
     useEffect(() => {
       const keydownHandler = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
+        if (submitKeys.includes(e.key)) {
           setCalloutTargetElement(null);
           setCurrentIndex(null);
         }
@@ -104,6 +100,8 @@ const StringArrayEditor = React.memo(
         ) {
           setCalloutTargetElement(null);
           setCurrentIndex(null);
+          // Remove empty variations
+          onChange(items.filter(Boolean));
         }
       };
 
@@ -114,7 +112,7 @@ const StringArrayEditor = React.memo(
         document.removeEventListener('keydown', keydownHandler);
         document.removeEventListener('focusin', focusHandler);
       };
-    }, []);
+    }, [items, onChange]);
 
     const selectToolbarMenuItem = React.useCallback(
       (insertText: string) => {
@@ -219,14 +217,13 @@ const StringArrayEditor = React.memo(
             key={key}
             mode={key === currentIndex ? 'edit' : 'view'}
             value={value}
-            onBlur={handleBlur}
             onChange={handleChange(key)}
             onFocus={handleFocus(key)}
             onRemove={handleRemove(key)}
             onShowCallout={handleShowCallout}
           />
         ))}
-        {addButtonVisible && (
+        {currentIndex === null && (
           <Link as="button" styles={styles.link} onClick={handleClickAddVariation}>
             {formatMessage('Add new variation')}
           </Link>
