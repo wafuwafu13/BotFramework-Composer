@@ -4,9 +4,10 @@
 import formatMessage from 'format-message';
 import React, { useCallback, useState } from 'react';
 
+import { CommonModalityEditorProps } from '../types';
+
 import { ModalityEditorContainer } from './ModalityEditorContainer';
 import { StringArrayEditor } from './StringArrayEditor';
-import { CommonModalityEditorProps } from '../types';
 
 const TextModalityEditor = React.memo(
   ({

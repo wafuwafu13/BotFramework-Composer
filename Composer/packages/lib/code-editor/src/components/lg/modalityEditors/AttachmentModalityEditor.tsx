@@ -4,8 +4,9 @@
 import formatMessage from 'format-message';
 import React from 'react';
 
-import { ModalityEditorContainer } from './ModalityEditorContainer';
 import { CommonModalityEditorProps } from '../types';
+
+import { ModalityEditorContainer } from './ModalityEditorContainer';
 
 const AttachmentModalityEditor = React.memo(
   ({ removeModalityDisabled: disableRemoveModality, onRemoveModality }: CommonModalityEditorProps) => {
