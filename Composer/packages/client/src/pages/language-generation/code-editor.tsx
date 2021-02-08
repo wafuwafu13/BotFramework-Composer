@@ -178,21 +178,23 @@ const CodeEditor: React.FC<CodeEditorProps> = (props) => {
     );
   }, [lgOption]);
 
-  const defaultLanguageFileEditor = (
-    <LgEditor
-      editorSettings={userSettings.codeEditor}
-      lgOption={{
-        fileId: dialogId,
-      }}
-      lgTemplates={file?.allTemplates}
-      mode="codeEditor"
-      options={{
-        readOnly: true,
-      }}
-      value={defaultLangContent}
-      onChange={() => {}}
-    />
-  );
+  const defaultLanguageFileEditor = useMemo(() => {
+    return (
+      <LgEditor
+        editorSettings={userSettings.codeEditor}
+        lgOption={{
+          fileId: dialogId,
+        }}
+        lgTemplates={file?.allTemplates}
+        mode="codeEditor"
+        options={{
+          readOnly: true,
+        }}
+        value={defaultLangContent}
+        onChange={() => {}}
+      />
+    );
+  }, [dialogId]);
 
   return (
     <Fragment>

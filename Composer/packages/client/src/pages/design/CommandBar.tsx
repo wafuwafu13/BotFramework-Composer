@@ -16,17 +16,15 @@ import {
   dispatcherState,
   rootBotProjectIdSelector,
   currentDialogState,
-  designPageLocationState,
 } from '../../recoilModel';
 import { undoFunctionState } from '../../recoilModel/undo/history';
 import { undoStatusSelectorFamily } from '../../recoilModel/selectors/undo';
 import { DiagnosticsHeader } from '../../components/DiagnosticsHeader';
 import TelemetryClient from '../../telemetry/TelemetryClient';
 
-type CommandBarProps = { projectId: string };
+type CommandBarProps = { dialogId?: string; projectId: string };
 
-const CommandBar: React.FC<CommandBarProps> = React.memo(({ projectId }) => {
-  const { dialogId } = useRecoilValue(designPageLocationState(projectId));
+const CommandBar: React.FC<CommandBarProps> = ({ dialogId, projectId }) => {
   const currentDialog = useRecoilValue(currentDialogState({ dialogId, projectId }));
   const { undo, redo, clearUndo } = useRecoilValue(undoFunctionState(projectId));
   const rootProjectId = useRecoilValue(rootBotProjectIdSelector) ?? projectId;
@@ -187,6 +185,6 @@ const CommandBar: React.FC<CommandBarProps> = React.memo(({ projectId }) => {
       <Toolbar toolbarItems={toolbarItems} />
     </div>
   );
-});
+};
 
 export default CommandBar;

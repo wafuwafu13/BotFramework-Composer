@@ -9,7 +9,6 @@ import formatMessage from 'format-message';
 import { IconButton } from 'office-ui-fabric-react/lib/Button';
 import { FocusZone } from 'office-ui-fabric-react/lib/FocusZone';
 import { TooltipHost, DirectionalHint } from 'office-ui-fabric-react/lib/Tooltip';
-import { RouteComponentProps } from '@reach/router';
 
 import { resolveToBasePath } from '../../utils/fileUtil';
 import { BASEPATH } from '../../constants';
@@ -65,7 +64,7 @@ const divider = (isExpand: boolean) => css`
 
 // -------------------- SideBar -------------------- //
 
-export const SideBar: React.FC<RouteComponentProps> = () => {
+export const SideBar = () => {
   const [sideBarExpand, setSideBarExpand] = useState(false);
   const { topLinks, bottomLinks } = useLinks();
 

@@ -15,8 +15,8 @@ import LgWorker from './../parsers/lgWorker';
 import LgDiagnosticWorker from './../parsers/lgDiagnosticWorker';
 import { lgFileIdsState, lgFileState, localeState, settingsState } from './../atoms/botState';
 
-const templateIsNotEmpty = ({ name }) => {
-  return !!name;
+const templateIsNotEmpty = ({ name, body }) => {
+  return !!name && !!body;
 };
 
 // fill other locale lgFile new added template with '- '
@@ -101,13 +101,6 @@ export const getRelatedLgFileChanges = async (
   const onlyAdds = addedTemplates.length && !deletedTemplates.length;
   const onlyDeletes = !addedTemplates.length && deletedTemplates.length;
 
-  //TODO(zhixzhan): do completed comparation to find all template updates to sync.
-  const singleNameUpdate =
-    addedTemplates.length === 1 && deletedTemplates.length === 1
-      ? updatedLgFile.templates.findIndex(({ name }) => name === addedTemplates[0].name) ===
-        originLgFile.templates.findIndex(({ name }) => name === deletedTemplates[0].name)
-      : false;
-
   // sync add/remove templates
   if (onlyAdds || onlyDeletes) {
     for (const file of sameIdOtherLocaleFiles) {
@@ -116,18 +109,6 @@ export const getRelatedLgFileChanges = async (
         projectId,
         newLgFile,
         deletedTemplates.map(({ name }) => name),
-        lgFiles
-      )) as LgFile;
-      changes.push(newLgFile);
-    }
-    // sync name change
-  } else if (singleNameUpdate) {
-    for (const file of sameIdOtherLocaleFiles) {
-      const newLgFile = (await LgWorker.updateTemplate(
-        projectId,
-        file,
-        deletedTemplates[0].name,
-        addedTemplates[0],
         lgFiles
       )) as LgFile;
       changes.push(newLgFile);
@@ -249,7 +230,7 @@ export const lgDispatcher = () => {
 
         updateLgFiles(callbackHelpers, projectId, { updates: updatedFiles }, (current, changed) => {
           // compare to drop expired content already setted above.
-          return current.id === id ? current?.content === changed?.content : true;
+          return current?.content === changed?.content;
         });
 
         // if changes happen on common.lg, async re-parse all.

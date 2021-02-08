@@ -22,9 +22,8 @@ import Modals from './Modals';
 const DesignPage: React.FC<RouteComponentProps<{ dialogId: string; projectId: string; skillId?: string }>> = (
   props
 ) => {
-  const { projectId = '', skillId, location } = props;
-
-  useEmptyPropsHandler(projectId, location, skillId, props.dialogId);
+  const { dialogId, projectId = '', skillId, location } = props;
+  useEmptyPropsHandler(projectId, location, skillId, dialogId);
   const { setPageElementState } = useRecoilValue(dispatcherState);
 
   const onMeasuredSizesChanged = (sizes: SplitMeasuredSizes) => {
@@ -44,9 +43,9 @@ const DesignPage: React.FC<RouteComponentProps<{ dialogId: string; projectId: st
         splitterSize="5px"
         onMeasuredSizesChanged={onMeasuredSizesChanged}
       >
-        <SideBar projectId={activeBot} />
+        <SideBar dialogId={dialogId ?? ''} projectId={activeBot} />
         <div css={contentWrapper} role="main">
-          <CommandBar projectId={activeBot} />
+          <CommandBar dialogId={dialogId} projectId={activeBot} />
           <Conversation css={editorContainer}>
             <div css={editorWrapper}>
               <Split
@@ -56,7 +55,7 @@ const DesignPage: React.FC<RouteComponentProps<{ dialogId: string; projectId: st
                 minSecondarySize="350px"
                 renderSplitter={renderThinSplitter}
               >
-                <VisualPanel projectId={activeBot} />
+                <VisualPanel dialogId={dialogId} projectId={activeBot} />
                 <PropertyPanel isSkill={activeBot !== projectId} projectId={activeBot} />
               </Split>
             </div>
