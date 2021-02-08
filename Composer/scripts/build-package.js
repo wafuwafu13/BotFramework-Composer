@@ -134,6 +134,10 @@ function getUserOverrides() {
   };
 }
 
+async function cleanDist(outdir) {
+  await fs.emptyDir(outdir);
+}
+
 async function build(argv) {
   const buildOptions = {
     outdir: path.join(argv.package, 'dist'),
@@ -152,6 +156,8 @@ async function build(argv) {
   };
 
   buildOptions.entryPoints = buildOptions.entryPoints || (await resolveEntryPoint(buildOptions.bundle));
+
+  await cleanDist(buildOptions.outdir);
 
   return esbuild.build(buildOptions);
 }
