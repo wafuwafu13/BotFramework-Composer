@@ -3,16 +3,15 @@
   "license": "MIT",
   "version": "1.0.0",
   "description": "",
-  "main": "build/server.js",
+  "main": "dist/server.js",
   "engines": {
     "node": ">=12"
   },
   "scripts": {
     "analyze": "source-map-explorer 'build/public/static/js/*.js'",
-    "build": "tsc -p tsconfig.build.json && node scripts/build.js",
+    "build": "node ../../scripts/build-package.js && node scripts/build.js",
     "clean": "rimraf build",
-    "prep:dist:electron": "yarn build --outDir ../electron-server/dist && node scripts/copyAssets.js",
-    "start": "node --max-http-header-size=16000 build/init.js",
+    "start": "node --max-http-header-size=16000 dist/init.js",
     "start:dev": "nodemon",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -30,6 +29,9 @@
     ],
     "ext": "ts",
     "delay": 2
+  },
+  "esbuild": {
+    "format": "cjs"
   },
   "devDependencies": {
     "@botframework-composer/test-utils": "*",
