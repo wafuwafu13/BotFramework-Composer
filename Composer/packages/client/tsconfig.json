@@ -1,11 +1,18 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "baseUrl": ".",
     "outDir": "build",
     "allowJs": true,
     "module": "esnext",
     "declaration": false,
-    "declarationMap": false
+    "declarationMap": false,
+    "paths": {
+      "@bfc/adaptive-flow": ["../adaptive-flow"]
+    }
   },
-  "include": ["./src/**/*", "./__tests__/**/*", "./extension-container/**/*"]
+  "include": ["./src/**/*", "./__tests__/**/*", "./extension-container/**/*"],
+  "references": [
+    { "path": "../adaptive-flow" }
+  ]
 }
