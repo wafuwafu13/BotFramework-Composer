@@ -106,6 +106,8 @@
     "cross-env": "^6.0.3",
     "cypress": "^5.0.0",
     "cypress-plugin-tab": "^1.0.5",
+    "esbuild": "^0.8.43",
+    "esbuild-node-externals": "^1.0.2",
     "eslint": "7.0.0",
     "eslint-config-prettier": "6.11.0",
     "eslint-plugin-cypress": "2.11.1",
@@ -128,6 +130,7 @@
     "tslib": "^2.0.0",
     "typescript": "3.9.2",
     "wait-on": "^5.2.0",
-    "wsrun": "^5.2.0"
+    "wsrun": "^5.2.0",
+    "yargs": "^16.2.0"
   }
 }
