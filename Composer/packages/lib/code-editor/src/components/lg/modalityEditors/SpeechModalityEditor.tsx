@@ -66,6 +66,7 @@ const SpeechModalityEditor = React.memo(
         contentTitle={formatMessage('Response Variations')}
         disableRemoveModality={disableRemoveModality}
         dropdownOptions={inputHintOptions}
+        dropdownPrefix={formatMessage('Input hint: ')}
         modalityTitle={formatMessage('Suggested Actions')}
         modalityType="suggestedActions"
         removeModalityOptionText={formatMessage('Remove all speech responses')}

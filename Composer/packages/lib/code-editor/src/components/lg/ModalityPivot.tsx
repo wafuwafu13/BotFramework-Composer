@@ -62,7 +62,8 @@ const renderModalityEditor = (
   modality: ModalityType,
   onRemoveModality: (modality: ModalityType) => () => void,
   onModalityChange: (modality: ModalityType, body: string) => void,
-  onInputHintChange: (inputHintString) => void,
+  onAttachmentLayoutChange: (layout: string) => void,
+  onInputHintChange: (inputHintString: string) => void,
   modalityTemplates: Record<ModalityType, LgTemplate>,
   disableRemoveModality: boolean,
   lgOption?: LGOption,
@@ -74,6 +75,7 @@ const renderModalityEditor = (
       return (
         <AttachmentModalityEditor
           removeModalityDisabled={disableRemoveModality}
+          onAttachmentLayoutChange={onAttachmentLayoutChange}
           onModalityChange={(body: string) => onModalityChange('attachments', body)}
           onRemoveModality={onRemoveModality('attachments')}
         />
@@ -236,6 +238,8 @@ const ModalityPivot = React.memo((props: LgResponseEditorProps) => {
     }
   }, []);
 
+  const handleAttachmentLayoutChange = useCallback((layout) => {}, []);
+
   const handleInputHintChange = useCallback((inputHint: string) => {}, []);
 
   const addMenuProps = React.useMemo<IContextualMenuProps>(
@@ -264,6 +268,7 @@ const ModalityPivot = React.memo((props: LgResponseEditorProps) => {
           selectedKey,
           handleRemoveModality,
           onModalityChange,
+          handleAttachmentLayoutChange,
           handleInputHintChange,
           modalityTemplates,
           modalities.length === 1,

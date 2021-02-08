@@ -29,6 +29,24 @@ const styles: { link: ILinkStyles } = {
   },
 };
 
+const prosodyDefaultProps = {
+  key: 'value',
+};
+
+const audioDefaultProps = {
+  src: 'value',
+};
+
+const getSSMLProps = (tag: 'prosody' | 'audio' | 'break'): string => {
+  if (tag === 'break') {
+    return '';
+  }
+
+  return Object.entries(tag === 'prosody' ? prosodyDefaultProps : audioDefaultProps)
+    .map(([key, value]) => `${key}="${value}"`)
+    .join(' ');
+};
+
 type StringArrayEditorProps = {
   items: string[];
   selectedKey: string;
@@ -156,18 +174,22 @@ const StringArrayEditor = React.memo(
             const start = calloutTargetElement.selectionStart;
             const end = calloutTargetElement.selectionEnd;
 
-            if (ssmlTagType === 'break') {
+            if (ssmlTagType === 'break' || ssmlTagType === 'audio') {
               const item = updatedItems[currentIndex];
               const start = calloutTargetElement.selectionStart;
               const end =
                 typeof calloutTargetElement?.selectionEnd === 'number'
                   ? calloutTargetElement.selectionEnd
                   : calloutTargetElement.selectionStart;
-              updatedItems[currentIndex] = [item.slice(0, start), `<${ssmlTagType} />`, item.slice(end)].join('');
+              updatedItems[currentIndex] = [
+                item.slice(0, start),
+                `<${ssmlTagType} ${getSSMLProps(ssmlTagType)}/>`,
+                item.slice(end),
+              ].join('');
             } else {
               updatedItems[currentIndex] = [
                 item.slice(0, start),
-                `<${ssmlTagType}>`,
+                `<${ssmlTagType} ${getSSMLProps(ssmlTagType)}>`,
                 item.slice(start, end),
                 `</${ssmlTagType}>`,
                 item.slice(end),

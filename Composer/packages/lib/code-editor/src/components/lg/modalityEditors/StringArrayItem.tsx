@@ -9,13 +9,15 @@ import { Text } from 'office-ui-fabric-react/lib/Text';
 import { IconButton } from 'office-ui-fabric-react/lib/Button';
 import React, { useCallback, useEffect, useRef } from 'react';
 import formatMessage from 'format-message';
+import { LgTemplate } from '@bfc/shared';
 
 import { withTooltip } from '../../../utils/withTooltip';
+import { LgCodeEditor } from '../LgCodeEditor';
+import { LGOption } from '../../../utils';
 
 const removeIconClassName = 'string-array-item-remove-icon';
 
 const Root = styled(Stack)({
-  height: 48,
   borderBottom: `1px solid ${FluentTheme.palette.neutralLight}`,
 });
 
@@ -53,6 +55,10 @@ const Input = styled(TextField)({
   },
 });
 
+const CodeEditor = styled(LgCodeEditor)({
+  padding: '8px 0 8px 4px',
+});
+
 const textViewContainerStyles = {
   root: { height: 48, padding: '0 0 0 13px', userSelect: 'none', cursor: 'pointer' },
 };
@@ -72,11 +78,17 @@ const textFieldStyles = {
 
 type Props = {
   mode: 'edit' | 'view';
+  editorMode?: 'single' | 'editor';
+  lgOption?: LGOption;
+  lgTemplates?: readonly LgTemplate[];
+  memoryVariables?: readonly string[];
   value: string;
+  onBlur?: () => void;
   onRemove: () => void;
   onFocus: () => void;
-  onChange: (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => void;
-  onShowCallout: (target: HTMLInputElement) => void;
+  onChange?: (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => void;
+  onLgChange?: (value: string) => void;
+  onShowCallout?: (target: HTMLInputElement) => void;
 };
 
 type TextViewItemProps = Pick<Props, 'value' | 'onRemove' | 'onFocus'>;
@@ -131,7 +143,7 @@ const TextFieldItem = React.memo(({ value, onShowCallout, onChange }: TextFieldI
   const handleFocus = React.useCallback(
     (e: React.FocusEvent<HTMLInputElement>) => {
       e.stopPropagation();
-      onShowCallout(e.target as HTMLInputElement);
+      onShowCallout?.(e.target as HTMLInputElement);
     },
     [onShowCallout]
   );
@@ -139,7 +151,7 @@ const TextFieldItem = React.memo(({ value, onShowCallout, onChange }: TextFieldI
   const handleClick = React.useCallback(
     (e: React.MouseEvent<HTMLInputElement>) => {
       e.stopPropagation();
-      onShowCallout(e.target as HTMLInputElement);
+      onShowCallout?.(e.target as HTMLInputElement);
     },
     [onShowCallout]
   );
@@ -157,11 +169,33 @@ const TextFieldItem = React.memo(({ value, onShowCallout, onChange }: TextFieldI
 });
 
 export const StringArrayItem = (props: Props) => {
-  const { mode, onChange, onShowCallout, onRemove, onFocus, value } = props;
+  const {
+    editorMode = 'single',
+    lgOption,
+    lgTemplates,
+    memoryVariables,
+    mode,
+    onChange,
+    onLgChange = () => {},
+    onShowCallout,
+    onRemove,
+    onFocus,
+    value,
+  } = props;
   return (
     <Root verticalAlign="center">
       {mode === 'edit' ? (
-        <TextFieldItem value={value} onChange={onChange} onShowCallout={onShowCallout} />
+        editorMode === 'single' ? (
+          <TextFieldItem value={value} onChange={onChange} onShowCallout={onShowCallout} />
+        ) : (
+          <CodeEditor
+            height={150}
+            lgOption={lgOption}
+            lgTemplates={lgTemplates}
+            memoryVariables={memoryVariables}
+            onChange={onLgChange}
+          />
+        )
       ) : (
         <TextViewItem value={value} onFocus={onFocus} onRemove={onRemove} />
       )}

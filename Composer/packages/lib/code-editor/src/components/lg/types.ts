@@ -48,6 +48,7 @@ export type CommonModalityEditorProps = {
   lgOption?: LGOption;
   lgTemplates?: readonly LgTemplate[];
   memoryVariables?: readonly string[];
+  onAttachmentLayoutChange?: (layout: string) => void;
   onInputHintChange?: (inputHint: string) => void;
   onModalityChange: (body: string) => void;
   onRemoveModality: () => void;

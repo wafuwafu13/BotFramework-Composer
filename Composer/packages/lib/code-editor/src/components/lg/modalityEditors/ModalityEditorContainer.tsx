@@ -57,6 +57,7 @@ type Props = {
   contentDescription?: string;
   disableRemoveModality: boolean;
   dropdownOptions?: IDropdownOption[];
+  dropdownPrefix?: string;
   menuItems?: IContextualMenuItem[];
   modalityTitle: string;
   modalityType: ModalityType;
@@ -71,6 +72,7 @@ const ModalityEditorContainer: React.FC<Props> = ({
   contentDescription,
   disableRemoveModality,
   dropdownOptions,
+  dropdownPrefix = '',
   menuItems = [],
   removeModalityOptionText,
   modalityTitle,
@@ -112,11 +114,11 @@ const ModalityEditorContainer: React.FC<Props> = ({
   const renderTitle = React.useCallback(
     (optionProps?: IDropdownOption[], defaultRender?: (optionProps?: IDropdownOption[]) => JSX.Element | null) => (
       <Text variant="small">
-        {formatMessage('Input hint: ')}
+        {dropdownPrefix}
         {defaultRender?.(optionProps)}
       </Text>
     ),
-    []
+    [dropdownPrefix]
   );
 
   return (
