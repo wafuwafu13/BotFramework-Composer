@@ -123,5 +123,12 @@ module.exports = {
         'security/detect-unsafe-regex': 'off',
       },
     },
+    {
+      files: ['scripts/**/*.js'],
+      rules: {
+        '@typescript-eslint/no-var-requires': 'off',
+        'no-console': 'off',
+      },
+    },
   ],
 };
