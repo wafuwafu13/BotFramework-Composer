@@ -44,12 +44,13 @@ export type ModalityType = typeof modalityTypes[number];
 
 export type CommonModalityEditorProps = {
   removeModalityDisabled: boolean;
-  template?: LgTemplate;
   lgOption?: LGOption;
   lgTemplates?: readonly LgTemplate[];
   memoryVariables?: readonly string[];
+  template?: LgTemplate;
+  templateId: string;
   onAttachmentLayoutChange?: (layout: string) => void;
   onInputHintChange?: (inputHint: string) => void;
-  onModalityChange: (body: string) => void;
+  onTemplateChange: (templateId: string, body?: string) => void;
   onRemoveModality: () => void;
 };

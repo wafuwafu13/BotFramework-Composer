@@ -61,10 +61,10 @@ const styles: { tabs: Partial<IPivotStyles> } = {
 const renderModalityEditor = (
   modality: ModalityType,
   onRemoveModality: (modality: ModalityType) => () => void,
-  onModalityChange: (modality: ModalityType, body: string) => void,
+  onTemplateChange: (templateId: string, body?: string) => void,
   onAttachmentLayoutChange: (layout: string) => void,
   onInputHintChange: (inputHintString: string) => void,
-  modalityTemplates: Record<ModalityType, LgTemplate>,
+  modalityTemplates: Record<ModalityType, { template: LgTemplate; templateId: string }>,
   disableRemoveModality: boolean,
   lgOption?: LGOption,
   lgTemplates?: readonly LgTemplate[],
@@ -74,10 +74,15 @@ const renderModalityEditor = (
     case 'attachments':
       return (
         <AttachmentModalityEditor
+          lgOption={lgOption}
+          lgTemplates={lgTemplates}
+          memoryVariables={memoryVariables}
           removeModalityDisabled={disableRemoveModality}
+          template={modalityTemplates.speak.template}
+          templateId={modalityTemplates.speak.templateId}
           onAttachmentLayoutChange={onAttachmentLayoutChange}
-          onModalityChange={(body: string) => onModalityChange('attachments', body)}
           onRemoveModality={onRemoveModality('attachments')}
+          onTemplateChange={onTemplateChange}
         />
       );
     case 'speak':
@@ -87,10 +92,11 @@ const renderModalityEditor = (
           lgTemplates={lgTemplates}
           memoryVariables={memoryVariables}
           removeModalityDisabled={disableRemoveModality}
-          template={modalityTemplates.speak}
+          template={modalityTemplates.speak.template}
+          templateId={modalityTemplates.speak.templateId}
           onInputHintChange={onInputHintChange}
-          onModalityChange={(body: string) => onModalityChange('speak', body)}
           onRemoveModality={onRemoveModality('speak')}
+          onTemplateChange={onTemplateChange}
         />
       );
     case 'suggestedActions':
@@ -100,9 +106,10 @@ const renderModalityEditor = (
           lgTemplates={lgTemplates}
           memoryVariables={memoryVariables}
           removeModalityDisabled={disableRemoveModality}
-          template={modalityTemplates.suggestedActions}
-          onModalityChange={(body: string) => onModalityChange('suggestedActions', body)}
+          template={modalityTemplates.suggestedActions.template}
+          templateId={modalityTemplates.speak.templateId}
           onRemoveModality={onRemoveModality('suggestedActions')}
+          onTemplateChange={onTemplateChange}
         />
       );
     case 'text':
@@ -112,27 +119,32 @@ const renderModalityEditor = (
           lgTemplates={lgTemplates}
           memoryVariables={memoryVariables}
           removeModalityDisabled={disableRemoveModality}
-          template={modalityTemplates.text}
-          onModalityChange={(body: string) => onModalityChange('text', body)}
+          template={modalityTemplates.text.template}
+          templateId={modalityTemplates.text.templateId}
           onRemoveModality={onRemoveModality('text')}
+          onTemplateChange={onTemplateChange}
         />
       );
   }
 };
 
-const getInitialModalities = (modalityTemplates: Record<ModalityType, LgTemplate>): ModalityType[] => {
-  const modalities = Object.keys(modalityTemplates);
+const getInitialModalities = (modalityTemplates: Record<ModalityType, { template: LgTemplate }>): ModalityType[] => {
+  const modalities = Object.entries(modalityTemplates)
+    .map(([modality, { template }]) => (template ? modality : null))
+    .filter(Boolean);
   return modalities.length ? (modalities as ModalityType[]) : ['text'];
 };
 
 const ModalityPivot = React.memo((props: LgResponseEditorProps) => {
-  const { lgOption, lgTemplates, memoryVariables, onModalityChange = () => {} } = props;
-  const modalityTemplates = useMemo(
+  const { lgOption, lgTemplates, memoryVariables, onTemplateChange = () => {} } = props;
+
+  const modalityTemplates = React.useMemo(
     () =>
       modalityTypes.reduce((acc, modality) => {
-        const template = lgTemplates?.find(({ name }) => name === `${lgOption?.templateId}_${modality}`);
-        return template ? { ...acc, [modality]: template } : acc;
-      }, {} as Record<ModalityType, LgTemplate>),
+        const templateId = `${lgOption?.templateId}_${modality}`;
+        const template = lgTemplates?.find(({ name }) => name === templateId);
+        return { ...acc, [modality]: { template, templateId } };
+      }, {} as Record<ModalityType, { template: LgTemplate; templateId: string }>),
     [lgTemplates, lgOption?.templateId]
   );
 
@@ -212,14 +224,15 @@ const ModalityPivot = React.memo((props: LgResponseEditorProps) => {
 
   const handleRemoveModality = useCallback(
     (modality: ModalityType) => () => {
+      const templateId = modalityTemplates[modality].templateId;
       if (modalities.length > 1) {
         const updatedModalities = modalities.filter((item) => item !== modality);
         setModalities(updatedModalities);
         setSelectedKey(updatedModalities[0]);
-        onModalityChange(modality);
+        onTemplateChange?.(templateId);
       }
     },
-    [modalities, setModalities, setSelectedKey]
+    [modalities, setModalities, setSelectedKey, modalityTemplates]
   );
 
   const handleItemClick = useCallback(
@@ -238,7 +251,7 @@ const ModalityPivot = React.memo((props: LgResponseEditorProps) => {
     }
   }, []);
 
-  const handleAttachmentLayoutChange = useCallback((layout) => {}, []);
+  const handleAttachmentLayoutChange = useCallback((layout: string) => {}, []);
 
   const handleInputHintChange = useCallback((inputHint: string) => {}, []);
 
@@ -267,7 +280,7 @@ const ModalityPivot = React.memo((props: LgResponseEditorProps) => {
         {renderModalityEditor(
           selectedKey,
           handleRemoveModality,
-          onModalityChange,
+          onTemplateChange,
           handleAttachmentLayoutChange,
           handleInputHintChange,
           modalityTemplates,

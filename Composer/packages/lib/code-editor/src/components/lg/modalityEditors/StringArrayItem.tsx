@@ -182,6 +182,16 @@ export const StringArrayItem = (props: Props) => {
     onFocus,
     value,
   } = props;
+
+  const handleEditorDidMount = React.useCallback(
+    (_, editor) => {
+      if (editorMode === 'editor') {
+        editor?.focus();
+      }
+    },
+    [editorMode]
+  );
+
   return (
     <Root verticalAlign="center">
       {mode === 'edit' ? (
@@ -189,6 +199,7 @@ export const StringArrayItem = (props: Props) => {
           <TextFieldItem value={value} onChange={onChange} onShowCallout={onShowCallout} />
         ) : (
           <CodeEditor
+            editorDidMount={handleEditorDidMount}
             height={150}
             lgOption={lgOption}
             lgTemplates={lgTemplates}

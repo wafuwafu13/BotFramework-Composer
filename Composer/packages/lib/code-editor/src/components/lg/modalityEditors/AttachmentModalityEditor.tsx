@@ -18,13 +18,14 @@ const AttachmentModalityEditor = React.memo(
     removeModalityDisabled: disableRemoveModality,
     onAttachmentLayoutChange,
     onRemoveModality,
+    onTemplateChange,
   }: CommonModalityEditorProps) => {
-    const [items, setItems] = React.useState<string[]>(['1', '2']);
+    const [items, setItems] = React.useState<string[]>([]);
 
     const handleChange = React.useCallback(
       (newItems: string[]) => {
         setItems(newItems);
-        // onModalityChange(newItems.map((item) => `- ${item}`).join('\n'));
+        // onTemplateChange(newItems.map((item) => `- ${item}`).join('\n'));
       },
       [setItems]
     );
@@ -73,6 +74,7 @@ const AttachmentModalityEditor = React.memo(
           memoryVariables={memoryVariables}
           selectedKey="text"
           onChange={handleChange}
+          onTemplateChange={onTemplateChange}
         />
       </ModalityEditorContainer>
     );

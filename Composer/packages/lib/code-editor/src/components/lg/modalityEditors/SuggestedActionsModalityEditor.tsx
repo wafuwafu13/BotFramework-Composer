@@ -15,8 +15,9 @@ const SuggestedActionsModalityEditor = React.memo(
     lgTemplates,
     memoryVariables,
     template,
+    templateId,
     removeModalityDisabled: disableRemoveModality,
-    onModalityChange,
+    onTemplateChange,
     onRemoveModality,
   }: CommonModalityEditorProps) => {
     const [items, setItems] = React.useState<string[]>(
@@ -29,9 +30,9 @@ const SuggestedActionsModalityEditor = React.memo(
     const handleChange = React.useCallback(
       (newItems: string[]) => {
         setItems(newItems);
-        onModalityChange('- ' + newItems.map((item) => item).join(' | '));
+        onTemplateChange(templateId, '- ' + newItems.map((item) => item).join(' | '));
       },
-      [setItems, onModalityChange]
+      [setItems, templateId, onTemplateChange]
     );
 
     return (

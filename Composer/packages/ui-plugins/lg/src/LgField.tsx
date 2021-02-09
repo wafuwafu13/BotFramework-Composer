@@ -199,13 +199,13 @@ const LgField: React.FC<FieldProps<string>> = (props) => {
     [shellApi, projectId, locale]
   );
 
-  const handleModalityChange = React.useCallback(
-    async (modality: string, body?: string) => {
+  const handleTemplateChange = React.useCallback(
+    async (templateId: string, body?: string) => {
       if (designerId) {
         if (body) {
-          await shellApi.debouncedUpdateLgTemplate(lgFileId, `${lgName}_${modality}`, body);
+          await shellApi.debouncedUpdateLgTemplate(lgFileId, templateId, body);
         } else {
-          shellApi.removeLgTemplate(lgFileId, `${lgName}_${modality}`);
+          shellApi.removeLgTemplate(lgFileId, templateId);
         }
       }
     },
@@ -243,8 +243,8 @@ const LgField: React.FC<FieldProps<string>> = (props) => {
         value={template.body}
         onChange={onChange}
         onChangeSettings={handleSettingsChange}
-        onModalityChange={handleModalityChange}
         onNavigateToLgPage={navigateToLgPage}
+        onTemplateChange={handleTemplateChange}
       />
     </React.Fragment>
   );

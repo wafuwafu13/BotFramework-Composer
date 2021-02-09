@@ -15,7 +15,7 @@ import { LgSpeakModalityToolbar, SSMLTagType } from '../LgSpeakModalityToolbar';
 
 import { StringArrayItem } from './StringArrayItem';
 
-const submitKeys = ['Enter', 'Esc'];
+const submitKeys = ['Enter', 'Escape'];
 
 const styles: { link: ILinkStyles } = {
   link: {

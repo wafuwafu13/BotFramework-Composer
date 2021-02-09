@@ -13,10 +13,11 @@ const TextModalityEditor = React.memo(
   ({
     removeModalityDisabled: disableRemoveModality,
     template,
+    templateId,
     lgOption,
     lgTemplates,
     memoryVariables,
-    onModalityChange,
+    onTemplateChange,
     onRemoveModality,
   }: CommonModalityEditorProps) => {
     const [items, setItems] = useState<string[]>(template?.body?.replace(/- /g, '').split('\n') || []);
@@ -24,9 +25,9 @@ const TextModalityEditor = React.memo(
     const handleChange = useCallback(
       (newItems: string[]) => {
         setItems(newItems);
-        onModalityChange(newItems.map((item) => `- ${item}`).join('\n'));
+        onTemplateChange(templateId, newItems.map((item) => `- ${item}`).join('\n'));
       },
-      [setItems, onModalityChange]
+      [setItems, templateId, onTemplateChange]
     );
 
     return (
