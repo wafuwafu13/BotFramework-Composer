@@ -7,7 +7,7 @@ import { NeutralColors } from '@uifabric/fluent-theme/lib/fluent/FluentColors';
 import formatMessage from 'format-message';
 import { CommandBarButton } from 'office-ui-fabric-react/lib/Button';
 import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
-import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
+import { Dropdown, IDropdownOption, DropdownMenuItemType } from 'office-ui-fabric-react/lib/Dropdown';
 import { OverflowSet } from 'office-ui-fabric-react/lib/OverflowSet';
 import { Stack } from 'office-ui-fabric-react/lib/Stack';
 import { Text } from 'office-ui-fabric-react/lib/Text';
@@ -15,6 +15,7 @@ import { OpenConfirmModal } from '@bfc/ui-shared';
 import React from 'react';
 
 import { ModalityType } from '../types';
+import { ItemWithTooltip } from '../../ItemWithTooltip';
 
 import { ModalityEditorTitle } from './ModalityEditorTitle';
 
@@ -39,6 +40,9 @@ const styles = {
     },
   },
 };
+
+const removeMenuButtonItemProps = { styles: { label: { ...FluentTheme.fonts.small } } };
+const dropdownCalloutProps = { styles: { root: { minWidth: 140 } } };
 
 const onRenderOverflowButton = (overflowItems?: IContextualMenuItem[]): JSX.Element => {
   return (
@@ -88,6 +92,7 @@ const ModalityEditorContainer: React.FC<Props> = ({
         key: 'remove',
         disabled: disableRemoveModality,
         text: removeModalityOptionText,
+        itemProps: removeMenuButtonItemProps,
         onClick: () => {
           (async () => {
             const confirm = await OpenConfirmModal(
@@ -121,6 +126,23 @@ const ModalityEditorContainer: React.FC<Props> = ({
     [dropdownPrefix]
   );
 
+  const renderOption = React.useCallback(
+    (
+      itemProps?: IDropdownOption,
+      defaultRender?: (props?: IDropdownOption) => JSX.Element | null
+    ): JSX.Element | null =>
+      itemProps?.itemType === DropdownMenuItemType.Header ? (
+        <ItemWithTooltip
+          itemText={defaultRender?.(itemProps)}
+          tooltipId="attachment-layout-dropdown-header"
+          tooltipText={formatMessage.rich('Specify an attachment layout when there are more than one.')}
+        />
+      ) : (
+        defaultRender?.(itemProps) ?? null
+      ),
+    []
+  );
+
   return (
     <Root>
       <HeaderContainer>
@@ -133,10 +155,12 @@ const ModalityEditorContainer: React.FC<Props> = ({
           <Stack horizontal verticalAlign="center">
             {dropdownOptions && onDropdownChange && (
               <Dropdown
+                calloutProps={dropdownCalloutProps}
                 options={dropdownOptions}
                 placeholder={formatMessage('Select input hint')}
                 styles={styles.dropdown}
                 onChange={onDropdownChange}
+                onRenderOption={renderOption}
                 onRenderTitle={renderTitle}
               />
             )}

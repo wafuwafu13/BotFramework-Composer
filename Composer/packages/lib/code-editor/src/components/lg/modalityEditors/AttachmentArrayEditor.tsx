@@ -5,13 +5,19 @@ import { LgTemplate } from '@bfc/shared';
 import formatMessage from 'format-message';
 import { CommandButton, IButtonStyles } from 'office-ui-fabric-react/lib/Button';
 import { FluentTheme } from '@uifabric/fluent-theme';
-import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
+import {
+  IContextualMenuItem,
+  IContextualMenuProps,
+  IContextualMenuItemProps,
+} from 'office-ui-fabric-react/lib/ContextualMenu';
 import React from 'react';
 
 import { LGOption } from '../../../utils';
 import { jsLgToolbarMenuClassName } from '../constants';
 
 import { StringArrayItem } from './StringArrayItem';
+
+const noop = () => {};
 
 const styles: { button: IButtonStyles } = {
   button: {
@@ -21,6 +27,8 @@ const styles: { button: IButtonStyles } = {
     },
   },
 };
+
+const addButtonMenuItemProps: Partial<IContextualMenuItemProps> = { styles: { label: { ...FluentTheme.fonts.small } } };
 
 type AttachmentArrayEditorProps = {
   items: string[];
@@ -66,49 +74,59 @@ const AttachmentArrayEditor = React.memo(
       onTemplateChange,
     ]);
 
-    const newAttachmentMenuItems = React.useMemo<IContextualMenuItem[]>(
+    const newButtonMenuItems = React.useMemo<IContextualMenuItem[]>(
       () => [
         {
           key: 'addCustom',
           text: formatMessage('Add Custom'),
+          itemProps: addButtonMenuItemProps,
         },
         {
           key: 'template',
           text: formatMessage('Create from templates'),
+          itemProps: addButtonMenuItemProps,
           subMenuProps: {
             items: [
               {
                 key: 'hero',
                 text: formatMessage('Hero card'),
                 onClick: handleAddTemplateClick,
+                itemProps: addButtonMenuItemProps,
               },
               {
                 key: 'thumbnail',
                 text: formatMessage('Thumbnail card'),
+                itemProps: addButtonMenuItemProps,
               },
               {
                 key: 'signin',
                 text: formatMessage('Sign-in card'),
+                itemProps: addButtonMenuItemProps,
               },
               {
                 key: 'animation',
                 text: formatMessage('Animation card'),
+                itemProps: addButtonMenuItemProps,
               },
               {
                 key: 'video',
                 text: formatMessage('Video card'),
+                itemProps: addButtonMenuItemProps,
               },
               {
                 key: 'audio',
                 text: formatMessage('Audio card'),
+                itemProps: addButtonMenuItemProps,
               },
               {
                 key: 'adaptive',
                 text: formatMessage('Adaptive card'),
+                itemProps: addButtonMenuItemProps,
               },
               {
                 key: 'url',
-                text: formatMessage('Url card'),
+                text: formatMessage('Url'),
+                itemProps: addButtonMenuItemProps,
               },
             ],
           },
@@ -117,10 +135,16 @@ const AttachmentArrayEditor = React.memo(
       [handleAddTemplateClick]
     );
 
+    const addButtonMenuProps = React.useMemo<IContextualMenuProps>(() => ({ items: newButtonMenuItems }), [
+      newButtonMenuItems,
+    ]);
+
     React.useEffect(() => {
       const keydownHandler = (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
           setCurrentIndex(null);
+          // Remove empty variations
+          onChange(items.filter(Boolean));
         }
       };
 
@@ -169,9 +193,9 @@ const AttachmentArrayEditor = React.memo(
         ))}
         {currentIndex === null && (
           <CommandButton
-            menuProps={{ items: newAttachmentMenuItems }}
+            menuProps={addButtonMenuProps}
             styles={styles.button}
-            onClick={() => {}}
+            onClick={noop}
             onRenderMenuIcon={() => null}
           >
             {formatMessage('Add new attachment')}

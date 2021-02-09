@@ -101,6 +101,8 @@ const StringArrayEditor = React.memo(
         if (submitKeys.includes(e.key)) {
           setCalloutTargetElement(null);
           setCurrentIndex(null);
+          // Remove empty variations
+          onChange(items.filter(Boolean));
         }
       };
 

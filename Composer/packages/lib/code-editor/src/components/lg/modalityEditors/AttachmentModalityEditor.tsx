@@ -3,7 +3,7 @@
 
 import formatMessage from 'format-message';
 import React from 'react';
-import { IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
+import { IDropdownOption, DropdownMenuItemType } from 'office-ui-fabric-react/lib/Dropdown';
 
 import { CommonModalityEditorProps } from '../types';
 
@@ -32,6 +32,7 @@ const AttachmentModalityEditor = React.memo(
 
     const attachmentLayoutOptions = React.useMemo<IDropdownOption[]>(
       () => [
+        { key: 'header', text: formatMessage('Attachment layout'), itemType: DropdownMenuItemType.Header },
         {
           key: 'list',
           text: formatMessage('List'),
